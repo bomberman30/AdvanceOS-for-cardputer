@@ -1,4 +1,7 @@
 # BombermanOS
+
+ <img src="gitFiles/BombermanOS_logo.png?raw=true">
+
 BombermanOS is software for cardputerADV, primarily designed for media playback and file display.
 
 Currently, it can play MP3 files, and in the future, I hope to enable playback via Bluetooth.
