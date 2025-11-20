@@ -1,6 +1,7 @@
-# BombermanOS
-<img src="gitFiles/BombermanOS_logo.png?raw=true">
-BombermanOS is a lightweight operating system for the CardputerADV, designed primarily for media playback and file browsing.
+# AdvanceOS
+
+
+AdvanceOS is a lightweight operating system for the CardputerADV, designed primarily for media playback and file browsing.
 Currently, it supports MP3 playback. In the future, I plan to add Bluetooth audio support.
 Upcoming features include text viewing and editing, as well as image display capabilities.
 
@@ -12,9 +13,9 @@ Download the latest .bin file from the Releases section and flash it using the E
 Instructions and download link: [ESP Flash Download Tool](https://docs.espressif.com/projects/esp-test-tools/en/latest/esp32/production_stage/tools/flash_download_tool.html)
 * Option 2: Recommended – M5Burner
 Use M5Burner:
-Select Cardputer from the sidebar, search for BombermanOS, and install it directly.
+Select Cardputer from the sidebar, search for AdvanceOS, and install it directly.
 * Option 3: Using the Launcher
-If you already have the Launcher installed on your Cardputer, you can install BombermanOS via SD card:
+If you already have the Launcher installed on your Cardputer, you can install AdvanceOS via SD card:
  Download the latest .bin file
  Copy it to your SD card
  Use the Launcher to install it
