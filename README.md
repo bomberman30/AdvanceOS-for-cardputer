@@ -2,7 +2,7 @@
 
 <img src="gitFiles/SplashImage.png?raw=true">
 AdvanceOS is a lightweight operating system for the CardputerADV, designed primarily for media playback and file browsing.
-Currently, it supports MP3 playback. In the future, I plan to add Bluetooth audio support.
+Currently, it supports MP3 playback. In the future, Text editor and lots's of cool stuff!
 Upcoming features include text viewing and editing, as well as image display capabilities.
 
 
