@@ -34,9 +34,10 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - -> fast execute file
 
 🛠️ Planned Features
-- [ ] File management: delete, copy, and move files
-- [ ] Text editor: create and edit .txt files
+- [X] File management: delete, copy,  files DONE!!  (move files is little tricky with folders with files)
+- [X] Text editor: view create and edit .txt .json .conf files DONE!!
 - [ ] Timer functionality
+- [ ] Step's Counter!
 - [ ] Image viewer
 
 💡 Suggestions Welcome!
