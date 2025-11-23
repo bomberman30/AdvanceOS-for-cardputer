@@ -33,6 +33,14 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - ENTER open file menu
 - -> fast execute file
 
+* in Text editor
+- FN + Left Arrow : move curser to left 
+- FN + right Arrow : move curser to right 
+- FN + Up Arrow : scroll text
+- FN + Down Arrow : scroll text
+- ESC open Menu
+
+
 🛠️ Planned Features
 - [X] File management: delete, copy,  files DONE!!  (move files is little tricky with folders with files)
 - [X] Text editor: view create and edit .txt .json .conf files DONE!!
