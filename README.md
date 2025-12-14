@@ -55,9 +55,9 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - [x] Image viewer (PNG ,jpeg is next) can zoom in and out and pan image by arrow keys and +/- keys
 - [x] Notes for daily use
 - [x] mic record to SD card
-- [x] ESP project remote control see here more info [here](https://github.com/bomberman30/AdvanceOS-for-cardputer/wiki)
+- [x] ESP project remote control see more info [here](https://github.com/bomberman30/AdvanceOS-for-cardputer/wiki)
 - [ ] radio (Maybe)
-- [x] IR Sender Put IR files in sd card and send via the cardputer you can find files [here](https://github.com/Lucaslhm/Flipper-IRDB)
+- [x] IR Sender Put IR files in sd card and send via the cardputer you can find IR files [here](https://github.com/Lucaslhm/Flipper-IRDB)
 
 -💡 Suggestions are Welcome!
 If you have practical ideas or feature requests, feel free to share!
