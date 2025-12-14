@@ -55,7 +55,11 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - [x] Image viewer (PNG ,jpeg is next) can zoom in and out and pan image by arrow keys and +/- keys
 - [x] Notes for daily use
 - [x] mic record to SD card
+- [x] ESP project remote controll see gere more info 
+https://github.com/bomberman30/AdvanceOS-for-cardputer/wiki
 
+- [ ] radio (Maybe)
+- [ ] IR Sender
 💡 Suggestions Welcome!
 If you have practical ideas or feature requests, feel free to share!
 
