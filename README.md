@@ -47,7 +47,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - -> move next song
 - <- move back song
 
-* in 3D renderer
+# in 3D renderer
 * use file 3d file example from 3D_MODEL folder
 - 1 to toggle back face culling
 - +/- zoom in or out
