@@ -48,6 +48,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - <- move back song
 
 🛠️ Planned Features
+- [X] 3d render , it can play small OBJ file as wireframe , you can create 3d model in blender and delete the camera and the light, export as OBJ,
 - [X] File management: delete, copy,  files DONE!! 
 - [X] Text editor: view create and edit .txt .json .conf files DONE!!
 - [X] Timer functionality
