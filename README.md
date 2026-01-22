@@ -21,7 +21,11 @@ If you already have the Launcher installed on your Cardputer, you can install Ad
  Use the Launcher to install it
 More info: [Launcher GitHub](https://github.com/bmorcelli/Launcher)
 
-🎮 How to Use
+# Very Importent
+if in some use some menu not open it mean it out of memory restart the cardputer and enter directly to the menu and it will work
+
+
+# 🎮 How to Use
 - A microSD card is required. The file system must be FAT (i think FAT32 will work too). NTFS and exFAT are not supported. (New card (Fast 
 How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FATFAT16-not-FAT32/
 - Navigation is simple:
@@ -49,6 +53,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 
 # in 3D renderer
 * use file 3d file example from 3D_MODEL folder
+* 2 toggle view modes
 - 1 to toggle back face culling
 - +/- zoom in or out
 - keys to rotate
