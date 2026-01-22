@@ -22,7 +22,7 @@ If you already have the Launcher installed on your Cardputer, you can install Ad
 More info: [Launcher GitHub](https://github.com/bmorcelli/Launcher)
 
 # Very Importent
-if in some use some menu not open it mean it out of memory restart the cardputer and enter directly to the menu and it will work
+if after some use,in some menu not open (like Remote ESP or Record that demand lot's of RAM) it mean it out of memory restart the cardputer and enter directly to the menu and it will work!
 
 
 # 🎮 How to Use
@@ -32,12 +32,12 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - ESC → Go back
 - Enter → Select
 - - / + → Adjust volume
-* in file system
+# in file system
 
 - ENTER open file menu
 - -> fast execute file
 
-* in Text editor
+# in Text editor
 - FN + Left Arrow : move curser to left 
 - FN + right Arrow : move curser to right 
 - FN + Up Arrow : scroll text
@@ -45,7 +45,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - ESC open Menu
 
 
-* in Media Player
+# in Media Player
 - [ back 7 second
 - ] forward 7 second
 - -> move next song
@@ -58,7 +58,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - +/- zoom in or out
 - keys to rotate
 
-🛠️ Planned Features
+# 🛠️ Planned Features
 - [X] 3d render , it can play small OBJ file as wireframe , you can create 3d model in blender and delete the camera and the light, export as OBJ,
 - [X] File management: delete, copy,  files DONE!! 
 - [X] Text editor: view create and edit .txt .json .conf files DONE!!
@@ -72,7 +72,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - [ ] radio (Maybe)
 - [x] IR Sender Put IR files in sd card and send via the cardputer you can find IR files [here](https://github.com/Lucaslhm/Flipper-IRDB)
 
--💡 Suggestions are Welcome!
+#💡 Suggestions are Welcome!
 If you have practical ideas or feature requests, feel free to share!
 
 
