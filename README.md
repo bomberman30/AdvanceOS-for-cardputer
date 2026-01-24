@@ -53,10 +53,9 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 
 # in 3D renderer
 * use file 3d file example from 3D_MODEL folder
-* 2 toggle view modes
-- 1 to toggle back face culling
-- +/- zoom in or out
+* 1 toggle view modes
 - keys to rotate
+- E S D A move camera , arrows key rotate camera
 
 # 🛠️ Planned Features
 - [X] 3d render , it can play small OBJ file as wireframe , you can create 3d model in blender and delete the camera and the light, export as OBJ,
