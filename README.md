@@ -50,12 +50,16 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - ] forward 7 second
 - -> move next song
 - <- move back song
+- + key or - key to change volume
 
 # in 3D renderer
 * use file 3d file example from 3D_MODEL folder
-* 1 toggle view modes
-- keys to rotate
+* 1 key normal view press again to change beckground
+* 2 key Grey view like Blendrer software
+* 3 key wireframe view
+- Arrow keys to rotate
 - E S D A move camera , arrows key rotate camera
+- W or R keys move up or down
 
 # 🛠️ Planned Features
 - [X] 3d render , it can play small OBJ file as wireframe , you can create 3d model in blender , export as OBJ, you can assing simple shader like color and assing to the faces, if the load freeze maybe it's large file,
