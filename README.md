@@ -62,7 +62,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - W or R keys move up or down
 
 # 🛠️ Planned Features
-- [X] 3d render , it can play small OBJ file as wireframe , you can create 3d model in blender , export as OBJ, you can assing simple shader like color and assing to the faces, if the load freeze maybe it's large file,
+- [X] 3d render , it can play small OBJ file (simple materials like colors in faces not Texture), you can create 3d model in blender, export as OBJ, you can assing simple shader like color and assing to the faces, if the load freeze maybe it's too large file, (FPS added to see how the CARDPUTER can handle it)
 - [X] File management: delete, copy,  files DONE!! 
 - [X] Text editor: view create and edit .txt .json .conf files DONE!!
 - [X] Timer functionality
