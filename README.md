@@ -49,7 +49,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - ] forward 7 second
 - -> move next song
 - <- move back song
-- PLUS key _ or MINUS key + to change volume
+- PLUS key + or MINUS key _ to change volume
 
 # in 3D renderer
 * use file 3d file example from 3D_MODEL folder or create yourself in 3D software like BLENDER
