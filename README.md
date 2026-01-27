@@ -53,7 +53,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - + key or - key to change volume
 
 # in 3D renderer
-* use file 3d file example from 3D_MODEL folder
+* use file 3d file example from 3D_MODEL folder or create yourself in 3D software like BLENDER
 * 1 key normal view press again to change beckground
 * 2 key Grey view like Blendrer software
 * 3 key wireframe view
@@ -62,7 +62,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - W or R keys move up or down
 
 # 🛠️ Planned Features
-- [X] 3d render , it can play small OBJ file (simple materials like colors in faces not Texture), you can create 3d model in blender, export as OBJ, you can assing simple shader like color and assing to the faces, if the load freeze maybe it's too large file, (FPS added to see how the CARDPUTER can handle it)
+- [X] 3d render , it can play small OBJ files, you can use models in 3D_MODEL folder( it render simple materials like colors in faces not Texture!, the materials is in MTL files near the OBJ file, they must be the same name to load the materials), you can create 3d model in blender, export as OBJ, you can assing simple shader like color and assing to the faces, if the load freeze maybe it's too large file, (FPS added to see how the CARDPUTER can handle it)
 - [X] File management: delete, copy,  files DONE!! 
 - [X] Text editor: view create and edit .txt .json .conf files DONE!!
 - [X] Timer functionality
