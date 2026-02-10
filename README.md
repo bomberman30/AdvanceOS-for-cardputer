@@ -4,6 +4,14 @@
 AdvanceOS is a lightweight operating system for the CardputerADV, designed primarily for media playback and file browsing.
 Currently, it supports MP3 and WAV playback. In the future, Text editor and lots's of cool stuff!
 Upcoming features include text viewing and editing, as well as image display capabilities.
+# Supported Files:
+MP3 WAV : music files
+IR : infra red code files (to emit infrared code)
+GIF PNG JPEG : picture files
+TXT JSON CONF : text files
+OBJ MTL : 3D Model files
+ESPRC : esp remote control files to controll other esp project remotly See WIKI
+
 
 
 ## 🚀 Installation Options
