@@ -10,7 +10,7 @@ Upcoming features include text viewing and editing, as well as image display cap
 * MP3 WAV : music files
 * IR : infra red code files (to emit infrared code)
 * GIF PNG JPEG : picture files
-* TXT JSON CONF : text files (i can add more files you can ask in issues Section)
+* TXT JSON CONF : text files (i can add more files type if you like. you can ask in issues Section)
 * OBJ MTL : 3D Model files
 * ESPRC : esp remote control files to controll other esp project remotly See WIKI
 
