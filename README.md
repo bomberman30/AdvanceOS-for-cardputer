@@ -5,8 +5,8 @@ Music Player<br>
 File explorer <br>
 <img src="gitFiles/screen_9116.bmp?raw=true">
 <img src="gitFiles/screen_97751.bmp?raw=true"><br>
-Painter use bucket tool and premitive shapes<br>
-<img src="gitFiles/PainterV2.bmp?raw=true"><br>
+Painter V2<br>
+<img src="gitFiles/PainterV2.bmp?raw=true"><br>use bucket tool and premitive shapes<br>
 <img src="gitFiles/PAint example1.bmp?raw=true"><br>
 <img src="gitFiles/screen_100373.bmp?raw=true">
 <img src="gitFiles/PAint example2.bmp?raw=true"><br>
