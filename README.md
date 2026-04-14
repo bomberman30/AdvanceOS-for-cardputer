@@ -74,7 +74,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - ENTER open file menu
 - -> fast execute file
 
-## Paint. !!NEW!! V2 is out 14/4/26
+## Painter !!NEW!! V2 is out 14/4/26
 <img src="gitFiles/PainterV2.bmp?raw=true"><br>
 
 - Arrows move courser, Hold FN to move slower,
