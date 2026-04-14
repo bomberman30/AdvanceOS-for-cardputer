@@ -26,6 +26,8 @@ Wifi Spectrum<br>
 <img src="gitFiles/screen_27807.bmp?raw=true"><br>
 Partition Viewer<br>
 <img src="gitFiles/screen_42323.bmp?raw=true"><br>
+Loan Calculator<br>
+<img src="gitFiles/screen_19291.bmp?raw=true"><br>
 
 
 
@@ -149,6 +151,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - [x] Paint draw new pictures or edit old pictures Can Open BMP file Or PNG and GIF you can choose any frame you want from the gif ( i can't do UNDO function like ctrl+z, the cardputer don't have much RAM you can save in S and Do risky thing . and if it's not good Reaload the image from file by press A)
 - [X] Timer functionality
 - [X] Step Counter!
+- [X] Loan Calculator. calculate Loan by intrest ,loan amount and Time
 - [X] Music Creator You can creat your old retro music , save the project, and export it as WAV file
 - [x] Alarm Clock. set the current time and wake up time, the carputer calculate the time and Enter DEEP SLEEP mode to save battery life After he wake up (you can wake him up manualy by press RESET After RESET you need to set the alarm again) he will sound the alarm and turn off himself (while the cardputer in deep sleep mode don't turn off the power switch or it will never sound the alarm)
 - [x] Image viewer (PNG ,GIF,JPEG) can zoom in and out and pan image by arrow keys and +/- keys(need small size PIC limited by Cardputer RAM)
