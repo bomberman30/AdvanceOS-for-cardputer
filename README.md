@@ -6,6 +6,7 @@ File explorer <br>
 <img src="gitFiles/screen_9116.bmp?raw=true">
 <img src="gitFiles/screen_97751.bmp?raw=true"><br>
 Painter use bucket tool and premitive shapes<br>
+<img src="gitFiles/PainterV2.bmp?raw=true"><br>
 <img src="gitFiles/PAint example1.bmp?raw=true"><br>
 <img src="gitFiles/screen_100373.bmp?raw=true">
 <img src="gitFiles/PAint example2.bmp?raw=true"><br>
@@ -73,7 +74,9 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - ENTER open file menu
 - -> fast execute file
 
-## Paint
+## Paint. !!NEW!! V2 is out 14/4/26
+<img src="gitFiles/PainterV2.bmp?raw=true"><br>
+
 - Arrows move courser, Hold FN to move slower,
 - ESC open menu (you can see al shortcut in this menu)
 - ENTER Paint / Accept in menu
