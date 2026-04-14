@@ -79,7 +79,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 ## Painter !!NEW!! V2 is out 14/4/26
 <img src="gitFiles/PainterV2.bmp?raw=true"><br>
 
-- Arrows move courser, Hold FN to move slower,
+- Arrows move courser,
 - ESC open menu (you can see al shortcut in this menu)
 - ENTER Paint / Accept in menu
 - +/- change brush size
@@ -129,7 +129,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - -> move next song
 - <- move back song
 - PLUS key + or MINUS key _ to change volume
-- BETA press 1 for normal sound Equalizer (It's a bit jarring in the headphones), press 2 for soft sound Equalizer
+- BETA press 1-5 KEYS to change Equalizer The Default Is Always 1  (Some jarring in the headphones Tell Me What You Prefer In Issues ), 
 
 ## Password Vault
 - DEL delete entry
