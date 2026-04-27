@@ -1,6 +1,12 @@
 #include "UnitAudioPlayerController.h"
-#include "../ExtraMenu.h"
+#include "./Classes/MainMenuV2.h"
 #include <MyOS.h>
+
+// ═════════════════════════════════════════════════════════════
+//  GLOBAL PLAYBACK STATE  –  program boyunca tek örnek
+// ═════════════════════════════════════════════════════════════
+AudioPlaybackState g_audioState;
+AudioPlayerUnit    g_audioPlayer;
 
 // ─── Sabit Veri ───────────────────────────────────────────────
 const char UnitAudioPlayerController::matrixChars[] =
@@ -13,6 +19,15 @@ const char UnitAudioPlayerController::matrixChars[] =
 void UnitAudioPlayerController::Begin()
 {
     showTopBar = false;
+
+    // ── Eğer modül zaten başlatılmışsa bağlantı ekranını atla ─
+    if (g_audioState.active)
+    {
+        // Diskangle'ı mevcut duruma göre ayarla
+        lastDiskPlaying = !g_audioState.isPlaying;
+        drawMainScreen();
+        return;
+    }
 
     // ── Bağlantı Ekranı ───────────────────────────────────────
     M5.Display.fillScreen(AP_COLOR_BG);
@@ -39,10 +54,10 @@ void UnitAudioPlayerController::Begin()
     M5.Display.printf("Port A: G%d / G%d", pin1, pin2);
 
     // ── Bağlantı Döngüsü ──────────────────────────────────────
-    int  counter = 0;
-    int  dotX    = 60;
+    int counter = 0;
+    int dotX    = 60;
 
-    while (!audioplayer.begin(&Serial1, pin1, pin2))
+    while (!g_audioPlayer.begin(&Serial1, pin1, pin2))
     {
         for (int i = 0; i < 5; i++) {
             uint8_t rv = (uint8_t)(10 + i * 4);
@@ -65,7 +80,7 @@ void UnitAudioPlayerController::Begin()
             M5.Display.setCursor(40, 90);
             M5.Display.print("CONNECTION FAILED!");
             delay(1500);
-            mainOS->ChangeMenu(new Extra(mainOS));
+            mainOS->ChangeMenu(new MainMenuV2(mainOS));
             return;
         }
     }
@@ -83,17 +98,17 @@ void UnitAudioPlayerController::Begin()
     delay(600);
 
     // ── Modül Ayarları ────────────────────────────────────────
-    audioplayer.setVolume(currentVolume);
-    audioplayer.setPlayMode(AUDIO_PLAYER_MODE_SINGLE_STOP);
+    g_audioPlayer.setVolume(g_audioState.currentVolume);
+    g_audioPlayer.setPlayMode(AUDIO_PLAYER_MODE_SINGLE_STOP);
     delay(300);
 
-    totalTracks        = audioplayer.getTotalAudioNumber();
-    currentTrack       = 1;
-    lastDisplayedTrack = 1;
-    audioplayer.selectAudioNum(1);
+    g_audioState.totalTracks     = g_audioPlayer.getTotalAudioNumber();
+    g_audioState.currentTrack    = 1;
+    g_audioState.lastPlayStatus  = AUDIO_PLAYER_STATUS_STOPPED;
+    g_audioPlayer.selectAudioNum(1);
 
-    initialized     = true;
-    lastDiskPlaying = !isPlaying;
+    g_audioState.active      = true;
+    lastDiskPlaying          = !g_audioState.isPlaying;
 
     // ── Ana Ekranı Çiz ────────────────────────────────────────
     drawMainScreen();
@@ -103,18 +118,16 @@ void UnitAudioPlayerController::Begin()
 
 void UnitAudioPlayerController::Loop()
 {
-    if (!initialized) return;
+    if (!g_audioState.active) return;
 
     M5.update();
 
-    // ── Info Ekranı ───────────────────────────────────────────
     if (isInfoScreen) {
         handleKeyboard();
         checkAutoNext();
         return;
     }
 
-    // ── Normal Mod ────────────────────────────────────────────
     updateMainDisplay();
     handleKeyboard();
 
@@ -132,18 +145,54 @@ void UnitAudioPlayerController::Draw()
 }
 
 // ═════════════════════════════════════════════════════════════
+//  ÇIKIŞ DİYALOGU  ←  YENİ MANTIK
+// ═════════════════════════════════════════════════════════════
+
+void UnitAudioPlayerController::handleExitRequest()
+{
+    // AskSomthing: "Evet" → true döner
+    bool stopSound = mainOS->AskSomthing(
+        "Exiting.. Stop The Sound Too?");
+
+    if (stopSound)
+    {
+        // ── Sesi durdur + state'i sıfırla ────────────────────
+        g_audioPlayer.pauseAudio();          // veya stopAudio()
+        g_audioState.isPlaying   = false;
+        g_audioState.active      = false;    // sonraki girişte
+                                             // yeniden bağlanır
+        g_audioState.lastPlayStatus =
+            AUDIO_PLAYER_STATUS_STOPPED;
+        Serial.println("[AudioPlayer] Ses durduruldu, çıkılıyor.");
+    }
+    else
+    {
+        // ── Ses arka planda devam etsin ───────────────────────
+        // g_audioState.isPlaying olduğu gibi kalır
+        // g_audioPlayer çalmaya devam eder
+        Serial.println("[AudioPlayer] Ses arka planda devam ediyor.");
+    }
+
+    // Her iki durumda da menüye dön
+    mainOS->ChangeMenu(new MainMenuV2(mainOS));
+}
+
+// ═════════════════════════════════════════════════════════════
 //  KLAVYE / BUTON İŞLEME
 // ═════════════════════════════════════════════════════════════
 
 void UnitAudioPlayerController::handleKeyboard()
 {
-    if (!M5Cardputer.Keyboard.isChange() || !M5Cardputer.Keyboard.isPressed()) return;
+    if (!M5Cardputer.Keyboard.isChange() ||
+        !M5Cardputer.Keyboard.isPressed()) return;
 
-    Keyboard_Class::KeysState st = M5Cardputer.Keyboard.keysState();
+    Keyboard_Class::KeysState st =
+        M5Cardputer.Keyboard.keysState();
 
     if (isInfoScreen) {
         for (auto k : st.word) {
-            if (k == 'i' || k == 'I' || k == '`' || k == '~') {
+            if (k == 'i' || k == 'I' ||
+                k == '`' || k == '~') {
                 exitInfoScreen();
                 return;
             }
@@ -163,7 +212,8 @@ void UnitAudioPlayerController::handleKeyboard()
 
 void UnitAudioPlayerController::handleKeyboardNormal()
 {
-    Keyboard_Class::KeysState st = M5Cardputer.Keyboard.keysState();
+    Keyboard_Class::KeysState st =
+        M5Cardputer.Keyboard.keysState();
 
     for (auto k : st.word) {
         switch (k) {
@@ -177,14 +227,23 @@ void UnitAudioPlayerController::handleKeyboardNormal()
                 inputTrackNumber = "";
                 drawInputMode();
                 return;
-            case 'i': case 'I': enterInfoScreen(); return;
+            case 'i': case 'I':
+                enterInfoScreen();
+                return;
             case '`': case '~':
-                mainOS->ChangeMenu(new Extra(mainOS));
+                // ── Çıkış diyaloğunu çağır ────────────────────
+                handleExitRequest();
                 return;
             case ',': executeAction(3); break;
             case '/': executeAction(2); break;
-            case ';': goToTrack(min((int)currentTrack + 10, (int)totalTracks)); break;
-            case '.': goToTrack(max((int)currentTrack - 10, 1));                break;
+            case ';':
+                goToTrack(min((int)g_audioState.currentTrack + 10,
+                              (int)g_audioState.totalTracks));
+                break;
+            case '.':
+                goToTrack(max((int)g_audioState.currentTrack - 10,
+                              1));
+                break;
         }
     }
 
@@ -195,14 +254,15 @@ void UnitAudioPlayerController::handleKeyboardNormal()
 
 void UnitAudioPlayerController::handleKeyboardInput()
 {
-    Keyboard_Class::KeysState st = M5Cardputer.Keyboard.keysState();
+    Keyboard_Class::KeysState st =
+        M5Cardputer.Keyboard.keysState();
 
     if (st.enter) {
         if (inputTrackNumber.length() > 0)
             goToTrack(inputTrackNumber.toInt());
         isInputMode      = false;
         inputTrackNumber = "";
-        lastDiskPlaying  = !isPlaying;
+        lastDiskPlaying  = !g_audioState.isPlaying;
         drawMainScreen();
         return;
     }
@@ -217,11 +277,12 @@ void UnitAudioPlayerController::handleKeyboardInput()
         if (k == 'g' || k == 'G') {
             isInputMode      = false;
             inputTrackNumber = "";
-            lastDiskPlaying  = !isPlaying;
+            lastDiskPlaying  = !g_audioState.isPlaying;
             drawMainScreen();
             return;
         }
-        if (k >= '0' && k <= '9' && inputTrackNumber.length() < 5) {
+        if (k >= '0' && k <= '9' &&
+            inputTrackNumber.length() < 5) {
             inputTrackNumber += k;
             drawInputMode();
         }
@@ -238,7 +299,8 @@ void UnitAudioPlayerController::handleButtonA()
                      ? clickCount + 1 : 1;
         lastClickTime = ct;
     }
-    if (clickCount > 0 && millis() - lastClickTime > CLICK_TIMEOUT) {
+    if (clickCount > 0 &&
+        millis() - lastClickTime > CLICK_TIMEOUT) {
         executeAction(clickCount);
         clickCount = 0;
     }
@@ -248,7 +310,8 @@ void UnitAudioPlayerController::handleButtonA()
 //  YARDIMCI: RENK
 // ═════════════════════════════════════════════════════════════
 
-void UnitAudioPlayerController::drawCreamLine(int y, float br)
+void UnitAudioPlayerController::drawCreamLine(
+        int y, float br)
 {
     for (int x = 0; x < 240; x++) {
         float    t  = (float)x / 239.0f;
@@ -260,8 +323,8 @@ void UnitAudioPlayerController::drawCreamLine(int y, float br)
     }
 }
 
-// Eski rainbow satırı - geriye dönük uyumluluk için bırakıldı
-void UnitAudioPlayerController::drawRainbowLine(int y, float br, float off)
+void UnitAudioPlayerController::drawRainbowLine(
+        int y, float br, float off)
 {
     drawCreamLine(y, br);
 }
@@ -272,7 +335,6 @@ void UnitAudioPlayerController::drawNeonText(
         int x, int y, const char* txt, uint16_t col, uint8_t sz)
 {
     M5.Display.setTextSize(sz);
-    // Krem gölge
     uint16_t shadow = M5.Display.color565(12, 8, 0);
     M5.Display.setTextColor(shadow, AP_COLOR_BG);
     M5.Display.setCursor(x + 1, y + 1);
@@ -285,7 +347,8 @@ void UnitAudioPlayerController::drawNeonText(
 // ─────────────────────────────────────────────────────────────
 
 void UnitAudioPlayerController::drawGlowRect(
-        int x, int y, int w, int h, uint16_t col, uint16_t inner)
+        int x, int y, int w, int h,
+        uint16_t col, uint16_t inner)
 {
     M5.Display.fillRoundRect(x, y, w, h, 3, inner);
     M5.Display.drawRoundRect(x, y, w, h, 3, col);
@@ -302,7 +365,6 @@ void UnitAudioPlayerController::drawGlowRect(
 
 void UnitAudioPlayerController::drawDiskBackground()
 {
-    // Dış glow - amber/krem
     for (int r = DISK_R + 4; r > DISK_R; r--) {
         float   br = 0.10f + 0.10f * (DISK_R + 4 - r);
         uint8_t rv = (uint8_t)(20 * br);
@@ -310,11 +372,8 @@ void UnitAudioPlayerController::drawDiskBackground()
         M5.Display.drawCircle(DISK_CX, DISK_CY, r,
             M5.Display.color565(rv, gv, 0));
     }
-
-    // Ana disk - koyu kahve
     M5.Display.fillCircle(DISK_CX, DISK_CY, DISK_R, AP_COLOR_CREAM5);
 
-    // Yivler - krem tonları
     int rr[] = {38, 34, 30, 26, 22, 18, 14};
     for (int i = 0; i < 7; i++) {
         uint8_t rv = (uint8_t)(6 + i * 5);
@@ -328,11 +387,13 @@ void UnitAudioPlayerController::drawDiskBackground()
 
 void UnitAudioPlayerController::drawDiskDynamic(float angle)
 {
-    // Dönen amber/krem dış halka
+    bool isPlaying = g_audioState.isPlaying;  // kısa alias
+
     for (int r = DISK_R - 1; r > DISK_R - 7; r--) {
         for (int a = 0; a < 360; a += 3) {
             float   rad = a * 3.14159f / 180.0f;
-            float   rot = fmod((float)a / 360.0f + angle / 360.0f, 1.0f);
+            float   rot = fmod((float)a / 360.0f +
+                               angle / 360.0f, 1.0f);
             uint8_t rv  = (uint8_t)(15 + rot * 16);
             uint8_t gv  = (uint8_t)(10 + rot * 12);
             int     px  = DISK_CX + (int)(r * cosf(rad));
@@ -342,7 +403,6 @@ void UnitAudioPlayerController::drawDiskDynamic(float angle)
         }
     }
 
-    // Dönen parlak nokta
     static float lastSA = 0;
     {
         float lr = lastSA * 3.14159f / 180.0f;
@@ -358,7 +418,6 @@ void UnitAudioPlayerController::drawDiskDynamic(float angle)
     M5.Display.fillCircle(sx, sy, 3, AP_COLOR_CREAM1);
     M5.Display.fillCircle(sx, sy, 1, AP_COLOR_AMBER);
 
-    // Merkez etiket
     M5.Display.fillCircle(DISK_CX, DISK_CY, 14, AP_COLOR_CREAM5);
     if (isPlaying) {
         float   t  = fmod(angle / 360.0f, 1.0f);
@@ -394,7 +453,7 @@ void UnitAudioPlayerController::drawFullDisk(float angle)
 
 void UnitAudioPlayerController::updateDiskRotation()
 {
-    targetDiskSpeed = isPlaying ? 5.0f : 0.0f;
+    targetDiskSpeed = g_audioState.isPlaying ? 5.0f : 0.0f;
     if (diskSpeed < targetDiskSpeed) {
         diskSpeed += 0.3f;
         if (diskSpeed > targetDiskSpeed) diskSpeed = targetDiskSpeed;
@@ -411,7 +470,7 @@ void UnitAudioPlayerController::updateDiskRotation()
 
 void UnitAudioPlayerController::updateVuMeter()
 {
-    if (!isPlaying) {
+    if (!g_audioState.isPlaying) {
         for (int i = 0; i < 12; i++) {
             if (vuLeft[i]  > 0) vuLeft[i]--;
             if (vuRight[i] > 0) vuRight[i]--;
@@ -441,17 +500,17 @@ void UnitAudioPlayerController::drawVuMeter()
         else if (i < 11) on_c = AP_COLOR_ORANGE;
         else             on_c = AP_COLOR_RED;
 
-        // Sol kanal
         M5.Display.fillRect(sx + i * (bW + bG), lyY, bW, bH,
             vuLeft[i] ? on_c : off_c);
         if (vuLeft[i])
-            M5.Display.drawFastHLine(sx + i * (bW + bG), lyY, bW, 0xFFFF);
+            M5.Display.drawFastHLine(sx + i * (bW + bG),
+                lyY, bW, 0xFFFF);
 
-        // Sağ kanal
         M5.Display.fillRect(sx + i * (bW + bG), ryY, bW, bH,
             vuRight[i] ? on_c : off_c);
         if (vuRight[i])
-            M5.Display.drawFastHLine(sx + i * (bW + bG), ryY, bW, 0xFFFF);
+            M5.Display.drawFastHLine(sx + i * (bW + bG),
+                ryY, bW, 0xFFFF);
     }
 }
 
@@ -461,7 +520,6 @@ void UnitAudioPlayerController::drawVuMeter()
 
 void UnitAudioPlayerController::drawTopBar()
 {
-    // Krem gradient
     for (int y = 0; y < 18; y++) {
         float   t  = (float)y / 17.0f;
         uint8_t rv = (uint8_t)(24 * (1.0f - t * 0.5f));
@@ -488,6 +546,11 @@ void UnitAudioPlayerController::drawTopBar()
 
 void UnitAudioPlayerController::drawLeftPanel()
 {
+    // g_audioState'ten kısa alias
+    bool     isPlaying    = g_audioState.isPlaying;
+    uint16_t currentTrack = g_audioState.currentTrack;
+    uint16_t totalTracks  = g_audioState.totalTracks;
+
     M5.Display.fillRect(0, 18, LEFT_W, 100, AP_COLOR_BG);
 
     // ── Track Header ──
@@ -524,17 +587,19 @@ void UnitAudioPlayerController::drawLeftPanel()
     M5.Display.setCursor(4, 37);
     M5.Display.print(ts);
 
-    // TIME etiketi
     M5.Display.setTextSize(1);
     M5.Display.setTextColor(AP_COLOR_CREAM2, AP_COLOR_BG);
     M5.Display.setCursor(76, 37);
     M5.Display.print("TIME");
 
     unsigned long el = isPlaying
-        ? (millis() - trackStartTime - totalPausedTime) / 1000 : 0;
+        ? (millis() - g_audioState.trackStartTime
+                     - g_audioState.totalPausedTime) / 1000
+        : 0;
     M5.Display.setTextColor(0xFFFF, AP_COLOR_BG);
     M5.Display.setCursor(74, 47);
-    M5.Display.printf("%02d:%02d", (int)(el / 60), (int)(el % 60));
+    M5.Display.printf("%02d:%02d",
+        (int)(el / 60), (int)(el % 60));
 
     M5.Display.drawFastHLine(0, 64, LEFT_W, 0x4208);
 
@@ -562,7 +627,7 @@ void UnitAudioPlayerController::drawLeftPanel()
 
     // Mod Rozeti
     M5.Display.fillRect(72, 65, LEFT_W - 72, 15, AP_COLOR_BG);
-    if (isLoopEnabled) {
+    if (g_audioState.isLoopEnabled) {
         M5.Display.fillRoundRect(72, 66, 56, 12, 2,
             M5.Display.color565(20, 14, 2));
         M5.Display.drawRoundRect(72, 66, 56, 12, 2, AP_COLOR_AMBER);
@@ -570,7 +635,7 @@ void UnitAudioPlayerController::drawLeftPanel()
             M5.Display.color565(20, 14, 2));
         M5.Display.setCursor(75, 69);
         M5.Display.print("LOOP ON");
-    } else if (isShuffleEnabled) {
+    } else if (g_audioState.isShuffleEnabled) {
         M5.Display.fillRoundRect(72, 66, 56, 12, 2,
             M5.Display.color565(12, 8, 1));
         M5.Display.drawRoundRect(72, 66, 56, 12, 2, AP_COLOR_WARM);
@@ -633,15 +698,13 @@ void UnitAudioPlayerController::drawBottomBar()
     M5.Display.fillRect(0, 118, 240, 17, AP_COLOR_CREAM5);
     drawCreamLine(118, 0.6f);
 
-    int vp = (currentVolume * 100) / 30;
+    int vp = (g_audioState.currentVolume * 100) / 30;
 
-    // VOL etiketi
     M5.Display.setTextSize(1);
     M5.Display.setTextColor(AP_COLOR_CREAM1, AP_COLOR_CREAM5);
     M5.Display.setCursor(3, 123);
     M5.Display.print("VOL");
 
-    // Ses barı - 18 segment
     const int bX = 26, bY = 121, sW = 4, sH = 9, sG = 1, totB = 18;
     int act = (vp * totB) / 100;
     for (int i = 0; i < totB; i++) {
@@ -659,21 +722,19 @@ void UnitAudioPlayerController::drawBottomBar()
         }
     }
 
-    // Yüzde
     char vstr[6]; sprintf(vstr, "%3d%%", vp);
     M5.Display.setTextColor(0xFFFF, AP_COLOR_CREAM5);
     M5.Display.setCursor(122, 123);
     M5.Display.print(vstr);
 
-    // Dikey ayırıcı
     M5.Display.drawFastVLine(148, 119, 16, 0x4208);
 
-    // Track bilgisi
     M5.Display.fillRect(149, 119, 91, 16, AP_COLOR_CREAM5);
     M5.Display.setTextSize(1);
     M5.Display.setTextColor(AP_COLOR_CREAM2, AP_COLOR_CREAM5);
     M5.Display.setCursor(153, 123);
-    char trk[16]; sprintf(trk, "TRACK #%03d", currentTrack);
+    char trk[16];
+    sprintf(trk, "TRACK #%03d", g_audioState.currentTrack);
     M5.Display.print(trk);
 }
 
@@ -687,7 +748,6 @@ void UnitAudioPlayerController::drawMainScreen()
     drawTopBar();
     drawLeftPanel();
 
-    // Dikey ayırıcı - krem tonu
     for (int y = 18; y < 118; y++) {
         float   t  = (float)(y - 18) / 99.0f;
         uint8_t rv = (uint8_t)(8 + t * 10);
@@ -708,32 +768,33 @@ void UnitAudioPlayerController::updateMainDisplay()
 {
     unsigned long now = millis();
 
-    // Disk
     if (now - lastDiskUpdate >= DISK_UPDATE_MS) {
         lastDiskUpdate = now;
         updateDiskRotation();
-        bool pChg = (lastDiskPlaying != isPlaying);
+        bool pChg = (lastDiskPlaying != g_audioState.isPlaying);
         if (diskSpeed > 0.01f || pChg) {
-            if (pChg) { drawFullDisk(diskAngle); lastDiskPlaying = isPlaying; }
-            else       drawDiskDynamic(diskAngle);
+            if (pChg) {
+                drawFullDisk(diskAngle);
+                lastDiskPlaying = g_audioState.isPlaying;
+            } else {
+                drawDiskDynamic(diskAngle);
+            }
         }
     }
 
-    // VU
     if (now - lastVuUpdate >= VU_UPDATE_MS) {
         lastVuUpdate = now;
         updateVuMeter();
         drawVuMeter();
     }
 
-    // Zaman
     if (now - lastTimeUpdate >= TIME_UPDATE_MS) {
         lastTimeUpdate = now;
         updateTimeDisplay();
     }
 
-    // Geçici mesaj süre kontrolü
-    if (tempMessageActive && (now - tempMessageTime > TEMP_MSG_DURATION)) {
+    if (tempMessageActive &&
+        (now - tempMessageTime > TEMP_MSG_DURATION)) {
         tempMessageActive = false;
         clearTempArea();
     }
@@ -743,6 +804,10 @@ void UnitAudioPlayerController::updateMainDisplay()
 
 void UnitAudioPlayerController::updateTrackDisplay()
 {
+    bool     isPlaying    = g_audioState.isPlaying;
+    uint16_t currentTrack = g_audioState.currentTrack;
+    uint16_t totalTracks  = g_audioState.totalTracks;
+
     M5.Display.fillRect(0, 36, LEFT_W, 28, AP_COLOR_BG);
     char ts[6]; sprintf(ts, "%03d", currentTrack);
     uint16_t numCol = isPlaying ? AP_COLOR_CREAM1 : AP_COLOR_CREAM2;
@@ -767,7 +832,6 @@ void UnitAudioPlayerController::updateTrackDisplay()
     M5.Display.setCursor(76, 37);
     M5.Display.print("TIME");
 
-    // Alt barda track
     M5.Display.fillRect(149, 119, 91, 16, AP_COLOR_CREAM5);
     M5.Display.setTextSize(1);
     M5.Display.setTextColor(AP_COLOR_CREAM2, AP_COLOR_CREAM5);
@@ -775,7 +839,6 @@ void UnitAudioPlayerController::updateTrackDisplay()
     char trk[16]; sprintf(trk, "TRACK #%03d", currentTrack);
     M5.Display.print(trk);
 
-    // Header toplam
     M5.Display.fillRect(78, 19, LEFT_W - 78, 15, AP_COLOR_CREAM5);
     char tot[12]; sprintf(tot, "/%d", totalTracks);
     M5.Display.setTextColor(AP_COLOR_CREAM2, AP_COLOR_CREAM5);
@@ -787,6 +850,8 @@ void UnitAudioPlayerController::updateTrackDisplay()
 
 void UnitAudioPlayerController::updateStatusDisplay()
 {
+    bool isPlaying = g_audioState.isPlaying;
+
     M5.Display.fillRect(0, 65, 72, 14, AP_COLOR_BG);
     if (isPlaying) {
         M5.Display.fillRoundRect(2, 66, 66, 12, 2,
@@ -816,7 +881,7 @@ void UnitAudioPlayerController::updateModeDisplay()
     M5.Display.fillRect(72, 65, LEFT_W - 72, 14, AP_COLOR_BG);
     M5.Display.setTextSize(1);
 
-    if (isLoopEnabled) {
+    if (g_audioState.isLoopEnabled) {
         M5.Display.fillRoundRect(72, 66, 56, 12, 2,
             M5.Display.color565(20, 14, 2));
         M5.Display.drawRoundRect(72, 66, 56, 12, 2, AP_COLOR_AMBER);
@@ -824,7 +889,7 @@ void UnitAudioPlayerController::updateModeDisplay()
             M5.Display.color565(20, 14, 2));
         M5.Display.setCursor(75, 69);
         M5.Display.print("LOOP ON");
-    } else if (isShuffleEnabled) {
+    } else if (g_audioState.isShuffleEnabled) {
         M5.Display.fillRoundRect(72, 66, 56, 12, 2,
             M5.Display.color565(12, 8, 1));
         M5.Display.drawRoundRect(72, 66, 56, 12, 2, AP_COLOR_WARM);
@@ -843,22 +908,22 @@ void UnitAudioPlayerController::updateModeDisplay()
 
 void UnitAudioPlayerController::updateTimeDisplay()
 {
+    bool isPlaying = g_audioState.isPlaying;
     unsigned long el = isPlaying
-        ? (millis() - trackStartTime - totalPausedTime) / 1000 : 0;
+        ? (millis() - g_audioState.trackStartTime
+                     - g_audioState.totalPausedTime) / 1000
+        : 0;
     M5.Display.fillRect(72, 46, 58, 12, AP_COLOR_BG);
     M5.Display.setTextSize(1);
     M5.Display.setTextColor(0xFFFF, AP_COLOR_BG);
     M5.Display.setCursor(74, 47);
-    M5.Display.printf("%02d:%02d", (int)(el / 60), (int)(el % 60));
+    M5.Display.printf("%02d:%02d",
+        (int)(el / 60), (int)(el % 60));
 }
 
 // ─────────────────────────────────────────────────────────────
-// Eski batarya fonksiyonu - artık kullanılmıyor, boş bırakıldı
 
-void UnitAudioPlayerController::updateBatteryDisplay()
-{
-    // Krem temada pil göstergesi kaldırıldı
-}
+void UnitAudioPlayerController::updateBatteryDisplay() {}
 
 // ═════════════════════════════════════════════════════════════
 //  GEÇİCİ MESAJ
@@ -917,7 +982,8 @@ void UnitAudioPlayerController::clearTempArea()
 
 // ─────────────────────────────────────────────────────────────
 
-void UnitAudioPlayerController::showTempMsg(const String& msg, uint16_t col)
+void UnitAudioPlayerController::showTempMsg(
+        const String& msg, uint16_t col)
 {
     tempMessageText   = msg;
     tempMessageColor  = col;
@@ -942,7 +1008,6 @@ void UnitAudioPlayerController::drawInputMode()
     M5.Display.print("\x0E GO TO TRACK \x0E");
     drawCreamLine(15, 0.6f);
 
-    // Ana kutu
     M5.Display.fillRoundRect(20, 24, 200, 72, 5, AP_COLOR_CREAM5);
     M5.Display.drawRoundRect(20, 24, 200, 72, 5, AP_COLOR_CREAM2);
     M5.Display.drawRoundRect(19, 23, 202, 74, 6,
@@ -957,7 +1022,6 @@ void UnitAudioPlayerController::drawInputMode()
 
     M5.Display.setTextSize(3);
     if (inputTrackNumber.length() > 0) {
-        // Gölge
         M5.Display.setTextColor(
             M5.Display.color565(12, 8, 0), AP_COLOR_BG);
         int tw = inputTrackNumber.length() * 18;
@@ -966,8 +1030,8 @@ void UnitAudioPlayerController::drawInputMode()
         M5.Display.setTextColor(AP_COLOR_CREAM1, AP_COLOR_BG);
         M5.Display.setCursor(120 - tw / 2, 47);
         M5.Display.print(inputTrackNumber);
-        // İmleç
-        M5.Display.fillRect(120 - tw / 2 + tw + 2, 47, 3, 20, AP_COLOR_AMBER);
+        M5.Display.fillRect(120 - tw / 2 + tw + 2,
+            47, 3, 20, AP_COLOR_AMBER);
     } else {
         M5.Display.setTextColor(AP_COLOR_CREAM5, AP_COLOR_BG);
         M5.Display.setCursor(82, 47);
@@ -980,7 +1044,7 @@ void UnitAudioPlayerController::drawInputMode()
     M5.Display.print("[ENTER] Confirm  [DEL] Delete  [G] Exit");
     M5.Display.setTextColor(0x4208, AP_COLOR_BG);
     M5.Display.setCursor(70, 112);
-    M5.Display.printf("Library: %d tracks", totalTracks);
+    M5.Display.printf("Library: %d tracks", g_audioState.totalTracks);
 
     drawCreamLine(121, 0.6f);
     drawCreamLine(122, 0.3f);
@@ -1025,7 +1089,6 @@ void UnitAudioPlayerController::enterInfoScreen()
     int ky    = 19;
 
     for (int i = 0; i < half; i++) {
-        // Sol kolon
         M5.Display.fillRoundRect(2, ky, 36, 9, 1, AP_COLOR_CREAM5);
         M5.Display.drawRoundRect(2, ky, 36, 9, 1, AP_COLOR_CREAM2);
         M5.Display.setTextColor(AP_COLOR_CREAM1, AP_COLOR_CREAM5);
@@ -1035,7 +1098,6 @@ void UnitAudioPlayerController::enterInfoScreen()
         M5.Display.setCursor(41, ky + 1);
         M5.Display.print(keys[i].desc);
 
-        // Sağ kolon
         int j = i + half;
         if (j < total) {
             M5.Display.fillRoundRect(122, ky, 36, 9, 1, AP_COLOR_CREAM5);
@@ -1062,7 +1124,7 @@ void UnitAudioPlayerController::enterInfoScreen()
 void UnitAudioPlayerController::exitInfoScreen()
 {
     isInfoScreen    = false;
-    lastDiskPlaying = !isPlaying;
+    lastDiskPlaying = !g_audioState.isPlaying;
     drawMainScreen();
 }
 
@@ -1072,10 +1134,11 @@ void UnitAudioPlayerController::exitInfoScreen()
 
 void UnitAudioPlayerController::volumeUp()
 {
-    if (currentVolume >= 30) return;
-    currentVolume++;
-    audioplayer.setVolume(currentVolume);
-    char m[20]; sprintf(m, "VOL %d%%", (currentVolume * 100) / 30);
+    if (g_audioState.currentVolume >= 30) return;
+    g_audioState.currentVolume++;
+    g_audioPlayer.setVolume(g_audioState.currentVolume);
+    char m[20];
+    sprintf(m, "VOL %d%%", (g_audioState.currentVolume * 100) / 30);
     drawBottomBar();
     showTempMsg(m, AP_COLOR_CREAM1);
 }
@@ -1084,10 +1147,11 @@ void UnitAudioPlayerController::volumeUp()
 
 void UnitAudioPlayerController::volumeDown()
 {
-    if (currentVolume <= 0) return;
-    currentVolume--;
-    audioplayer.setVolume(currentVolume);
-    char m[20]; sprintf(m, "VOL %d%%", (currentVolume * 100) / 30);
+    if (g_audioState.currentVolume <= 0) return;
+    g_audioState.currentVolume--;
+    g_audioPlayer.setVolume(g_audioState.currentVolume);
+    char m[20];
+    sprintf(m, "VOL %d%%", (g_audioState.currentVolume * 100) / 30);
     drawBottomBar();
     showTempMsg(m, AP_COLOR_CREAM2);
 }
@@ -1096,43 +1160,46 @@ void UnitAudioPlayerController::volumeDown()
 
 void UnitAudioPlayerController::toggleLoop()
 {
-    isLoopEnabled = !isLoopEnabled;
-    if (isLoopEnabled && isShuffleEnabled) isShuffleEnabled = false;
-    String   msg = isLoopEnabled ? "LOOP ON" : "LOOP OFF";
-    uint16_t c   = AP_COLOR_AMBER;
+    g_audioState.isLoopEnabled = !g_audioState.isLoopEnabled;
+    if (g_audioState.isLoopEnabled)
+        g_audioState.isShuffleEnabled = false;
+    String   msg = g_audioState.isLoopEnabled
+                   ? "LOOP ON" : "LOOP OFF";
     updateModeDisplay();
-    showTempMsg(msg, c);
+    showTempMsg(msg, AP_COLOR_AMBER);
 }
 
 // ─────────────────────────────────────────────────────────────
 
 void UnitAudioPlayerController::toggleShuffle()
 {
-    isShuffleEnabled = !isShuffleEnabled;
-    if (isShuffleEnabled && isLoopEnabled) isLoopEnabled = false;
-    String   msg = isShuffleEnabled ? "SHUFFLE ON" : "SHUFFLE OFF";
-    uint16_t c   = AP_COLOR_WARM;
+    g_audioState.isShuffleEnabled = !g_audioState.isShuffleEnabled;
+    if (g_audioState.isShuffleEnabled)
+        g_audioState.isLoopEnabled = false;
+    String msg = g_audioState.isShuffleEnabled
+                 ? "SHUFFLE ON" : "SHUFFLE OFF";
     updateModeDisplay();
-    showTempMsg(msg, c);
+    showTempMsg(msg, AP_COLOR_WARM);
 }
 
 // ─────────────────────────────────────────────────────────────
 
 void UnitAudioPlayerController::goToTrack(int n)
 {
-    if (n < 1 || n > (int)totalTracks) {
-        char m[25]; sprintf(m, "BAD! (1-%d)", totalTracks);
+    if (n < 1 || n > (int)g_audioState.totalTracks) {
+        char m[25];
+        sprintf(m, "BAD! (1-%d)", g_audioState.totalTracks);
         showTempMsg(m, AP_COLOR_RED);
         return;
     }
-    audioplayer.selectAudioNum(n);
+    g_audioPlayer.selectAudioNum(n);
     delay(100);
-    audioplayer.playAudio();
-    isPlaying         = true;
-    trackStartTime    = millis();
-    totalPausedTime   = 0;
-    currentTrack      = n;
-    lastDisplayedTrack = n;
+    g_audioPlayer.playAudio();
+
+    g_audioState.isPlaying       = true;
+    g_audioState.trackStartTime  = millis();
+    g_audioState.totalPausedTime = 0;
+    g_audioState.currentTrack    = n;
 
     char m[15]; sprintf(m, "GOTO %d", n);
     updateTrackDisplay();
@@ -1144,17 +1211,16 @@ void UnitAudioPlayerController::goToTrack(int n)
 
 void UnitAudioPlayerController::randomTrack()
 {
-    if (totalTracks == 0) return;
-    uint16_t rnd = random(1, totalTracks + 1);
-    audioplayer.selectAudioNum(rnd);
-    currentTrack       = rnd;
-    lastDisplayedTrack = rnd;
-    trackStartTime     = millis();
-    totalPausedTime    = 0;
+    if (g_audioState.totalTracks == 0) return;
+    uint16_t rnd = random(1, g_audioState.totalTracks + 1);
+    g_audioPlayer.selectAudioNum(rnd);
+    g_audioState.currentTrack    = rnd;
+    g_audioState.trackStartTime  = millis();
+    g_audioState.totalPausedTime = 0;
 
-    if (lastPlayStatus == AUDIO_PLAYER_STATUS_PLAYING) {
-        audioplayer.playAudio();
-        isPlaying = true;
+    if (g_audioState.lastPlayStatus == AUDIO_PLAYER_STATUS_PLAYING) {
+        g_audioPlayer.playAudio();
+        g_audioState.isPlaying = true;
     }
     char m[15]; sprintf(m, "RND %d!", rnd);
     updateTrackDisplay();
@@ -1166,35 +1232,44 @@ void UnitAudioPlayerController::randomTrack()
 void UnitAudioPlayerController::executeAction(int clicks)
 {
     if (clicks == 1) {
-        uint8_t st = audioplayer.checkPlayStatus();
+        uint8_t st = g_audioPlayer.checkPlayStatus();
         if (st == AUDIO_PLAYER_STATUS_PLAYING) {
-            audioplayer.pauseAudio();
-            pausedTime = millis();
-            isPlaying  = false;
+            g_audioPlayer.pauseAudio();
+            g_audioState.pausedTime = millis();
+            g_audioState.isPlaying  = false;
             updateStatusDisplay();
             showTempMsg("PAUSED", AP_COLOR_CREAM2);
         } else {
-            audioplayer.playAudio();
+            g_audioPlayer.playAudio();
             if (st == AUDIO_PLAYER_STATUS_STOPPED) {
-                trackStartTime  = millis();
-                totalPausedTime = 0;
+                g_audioState.trackStartTime  = millis();
+                g_audioState.totalPausedTime = 0;
             } else {
-                totalPausedTime += (millis() - pausedTime);
+                g_audioState.totalPausedTime +=
+                    (millis() - g_audioState.pausedTime);
             }
-            isPlaying = true;
+            g_audioState.isPlaying = true;
             updateStatusDisplay();
             showTempMsg("PLAYING", AP_COLOR_CREAM1);
         }
     }
     else if (clicks == 2) {
-        audioplayer.nextAudio(); delay(100); audioplayer.playAudio();
-        isPlaying = true; trackStartTime = millis(); totalPausedTime = 0;
+        g_audioPlayer.nextAudio();
+        delay(100);
+        g_audioPlayer.playAudio();
+        g_audioState.isPlaying       = true;
+        g_audioState.trackStartTime  = millis();
+        g_audioState.totalPausedTime = 0;
         updateStatusDisplay();
         showTempMsg("NEXT >>", AP_COLOR_CREAM1);
     }
     else if (clicks == 3) {
-        audioplayer.previousAudio(); delay(100); audioplayer.playAudio();
-        isPlaying = true; trackStartTime = millis(); totalPausedTime = 0;
+        g_audioPlayer.previousAudio();
+        delay(100);
+        g_audioPlayer.playAudio();
+        g_audioState.isPlaying       = true;
+        g_audioState.trackStartTime  = millis();
+        g_audioState.totalPausedTime = 0;
         updateStatusDisplay();
         showTempMsg("<< PREV", AP_COLOR_CREAM1);
     }
@@ -1208,74 +1283,62 @@ void UnitAudioPlayerController::checkAutoNext()
     if (millis() - lc < 500) return;
     lc = millis();
 
-    uint8_t cs = audioplayer.checkPlayStatus();
+    uint8_t cs = g_audioPlayer.checkPlayStatus();
 
-    if (lastPlayStatus == AUDIO_PLAYER_STATUS_PLAYING &&
-        cs == AUDIO_PLAYER_STATUS_STOPPED)
+    if (g_audioState.lastPlayStatus == AUDIO_PLAYER_STATUS_PLAYING
+        && cs == AUDIO_PLAYER_STATUS_STOPPED)
     {
-        if (isLoopEnabled) {
-            delay(100); audioplayer.playAudio(); delay(100);
-            trackStartTime = millis(); totalPausedTime = 0; isPlaying = true;
+        if (g_audioState.isLoopEnabled) {
+            delay(100); g_audioPlayer.playAudio(); delay(100);
+            g_audioState.trackStartTime  = millis();
+            g_audioState.totalPausedTime = 0;
+            g_audioState.isPlaying       = true;
             if (!isInfoScreen) showTempMsg("LOOP", AP_COLOR_AMBER);
         }
-        else if (isShuffleEnabled) {
-            uint16_t r = random(1, totalTracks + 1);
-            audioplayer.selectAudioNum(r); delay(200);
-            audioplayer.playAudio(); delay(100);
-            trackStartTime = millis(); totalPausedTime = 0; isPlaying = true;
+        else if (g_audioState.isShuffleEnabled) {
+            uint16_t r = random(1, g_audioState.totalTracks + 1);
+            g_audioPlayer.selectAudioNum(r); delay(200);
+            g_audioPlayer.playAudio(); delay(100);
+            g_audioState.trackStartTime  = millis();
+            g_audioState.totalPausedTime = 0;
+            g_audioState.isPlaying       = true;
             if (!isInfoScreen) showTempMsg("SHUFFLE", AP_COLOR_WARM);
         }
         else {
-            audioplayer.nextAudio(); delay(200);
-            audioplayer.playAudio(); delay(100);
-            trackStartTime = millis(); totalPausedTime = 0; isPlaying = true;
+            g_audioPlayer.nextAudio(); delay(200);
+            g_audioPlayer.playAudio(); delay(100);
+            g_audioState.trackStartTime  = millis();
+            g_audioState.totalPausedTime = 0;
+            g_audioState.isPlaying       = true;
             if (!isInfoScreen) showTempMsg("AUTO NEXT", AP_COLOR_CREAM1);
         }
     }
 
-    uint16_t rt = audioplayer.getCurrentAudioNumber();
-    if (rt < 1 || rt > totalTracks) return;
-
-    if (rt != lastDisplayedTrack) {
-        currentTrack       = rt;
-        lastDisplayedTrack = rt;
-        trackStartTime     = millis();
-        totalPausedTime    = 0;
+    uint16_t rt = g_audioPlayer.getCurrentAudioNumber();
+    if (rt >= 1 && rt <= g_audioState.totalTracks &&
+        rt != g_audioState.currentTrack)
+    {
+        g_audioState.currentTrack    = rt;
+        g_audioState.trackStartTime  = millis();
+        g_audioState.totalPausedTime = 0;
         if (!isInfoScreen) updateTrackDisplay();
     }
 
-    if (lastPlayStatus != cs) {
+    if (g_audioState.lastPlayStatus != cs) {
         if (cs == AUDIO_PLAYER_STATUS_PLAYING) {
-            if (lastPlayStatus == AUDIO_PLAYER_STATUS_PAUSED)
-                totalPausedTime += (millis() - pausedTime);
-            isPlaying = true;
+            if (g_audioState.lastPlayStatus
+                    == AUDIO_PLAYER_STATUS_PAUSED)
+                g_audioState.totalPausedTime +=
+                    (millis() - g_audioState.pausedTime);
+            g_audioState.isPlaying = true;
         } else if (cs == AUDIO_PLAYER_STATUS_PAUSED) {
-            pausedTime = millis();
-            isPlaying  = false;
+            g_audioState.pausedTime = millis();
+            g_audioState.isPlaying  = false;
         } else {
-            isPlaying = false;
+            g_audioState.isPlaying = false;
         }
         if (!isInfoScreen) updateStatusDisplay();
     }
-    lastPlayStatus = cs;
+    g_audioState.lastPlayStatus = cs;
 }
-/* 
-// ═════════════════════════════════════════════════════════════
-//  VİZUALİZER (Stub - krem temada devre dışı)
-// ═════════════════════════════════════════════════════════════
 
-void UnitAudioPlayerController::enterFullscreenVisualizer() {}
-void UnitAudioPlayerController::exitFullscreenVisualizer()  {}
-void UnitAudioPlayerController::switchVisualizerMode()      {}
-void UnitAudioPlayerController::handleKeyboardVisualizer()  {}
-void UnitAudioPlayerController::updateFullscreenVisualizer(){}
-void UnitAudioPlayerController::drawFullscreenBars()        {}
-void UnitAudioPlayerController::drawFullscreenWaves()       {}
-void UnitAudioPlayerController::drawMatrixRain()            {}
-void UnitAudioPlayerController::drawVisualizerHeader()      {}
-void UnitAudioPlayerController::initMatrixColumns()         {}
-void UnitAudioPlayerController::drawFullscreenTempMessage(
-        const String&, uint16_t)                            {}
-void UnitAudioPlayerController::showSplash()                {}
-uint16_t UnitAudioPlayerController::hsvToRgb565(
-        float, float, float) { return 0; } */

@@ -6,6 +6,27 @@
 #include <unit_audioplayer.hpp>
 #include "./GlobalParentClass.h"
 
+// ═════════════════════════════════════════════════════════════
+//  GLOBAL PLAYBACK STATE  (menüler arası taşınan durum)
+// ═════════════════════════════════════════════════════════════
+struct AudioPlaybackState {
+    bool     active          = false;   // modül başlatıldı mı?
+    bool     isPlaying       = false;
+    uint16_t currentTrack    = 1;
+    uint16_t totalTracks     = 0;
+    int      currentVolume   = 25;
+    bool     isLoopEnabled   = false;
+    bool     isShuffleEnabled= false;
+    uint8_t  lastPlayStatus  = 0;      // AUDIO_PLAYER_STATUS_*
+
+    unsigned long trackStartTime  = 0;
+    unsigned long pausedTime      = 0;
+    unsigned long totalPausedTime = 0;
+};
+// Tek global örnek – tüm Translation Unit'lerde paylaşılır
+extern AudioPlaybackState g_audioState;
+// Modül nesnesi de global tutulmalı ki Serial1 bağlantısı korunsun
+extern AudioPlayerUnit    g_audioPlayer;
 // ─── Krem Renk Paleti ─────────────────────────────────────────
 #define AP_COLOR_BG       0x0000
 #define AP_COLOR_CREAM1   0xF7D6   // Ana krem (açık)
@@ -34,6 +55,7 @@ public:
     void Begin();
     void Loop();
     void Draw();
+    void handleExitRequest();
     UnitAudioPlayerController(MyOS *os) : GlobalParentClass(os) {}
 
 private:
@@ -149,11 +171,12 @@ private:
         void handleKeyboardInput();
     void handleKeyboardNormal();
         void drawInputMode();
-    void drawRainbowLine(int y, float brightness = 0.9f, float offset = 0.0f);
-    void drawNeonText(int x, int y, const char* txt, uint16_t col, uint8_t sz = 1);
-    void drawGlowRect(int x, int y, int w, int h,
-                      uint16_t borderCol, uint16_t innerCol);
-                          void updateBatteryDisplay();
+       // void drawCreamLine(int y, float br, float);
+        void drawRainbowLine(int y, float brightness = 0.9f, float offset = 0.0f);
+        void drawNeonText(int x, int y, const char *txt, uint16_t col, uint8_t sz = 1);
+        void drawGlowRect(int x, int y, int w, int h,
+                          uint16_t borderCol, uint16_t innerCol);
+        void updateBatteryDisplay();
 
 };
 
