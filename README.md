@@ -24,7 +24,7 @@ Games (ARDUBOY NES GBC games) <br>
 <img src="gitFiles/screen_153126.bmp?raw=true"><br>
 Wifi Spectrum<br>
 <img src="gitFiles/screen_27807.bmp?raw=true"><br>
-Partition Viewer<br>
+Partition  Viewer<br>
 <img src="gitFiles/screen_42323.bmp?raw=true"><br>
 Loan Calculator<br>
 <img src="gitFiles/screen_19291.bmp?raw=true"><br>
