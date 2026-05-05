@@ -1,34 +1,32 @@
 # AdvanceOS
+<img src="gitFiles/screen_306602.bmp?raw=true">
+
 Music Player<br>
-<img src="gitFiles/screen_105219.bmp?raw=true">
 <img src="gitFiles/screen_71496.bmp?raw=true"><br>
 File explorer <br>
-<img src="gitFiles/screen_9116.bmp?raw=true">
 <img src="gitFiles/screen_97751.bmp?raw=true"><br>
 Painter V2<br>
 <img src="gitFiles/PainterV2.bmp?raw=true"><br>use bucket tool and premitive shapes<br>
 <img src="gitFiles/PAint example1.bmp?raw=true"><br>
-<img src="gitFiles/screen_100373.bmp?raw=true">
+
 <img src="gitFiles/PAint example2.bmp?raw=true"><br>
 Infrared Emitter And Editor<br>
 <img src="gitFiles/screen_52224.bmp?raw=true"><br>
-Talk to (not) AI chatbot<br>
-<img src="gitFiles/screen_11139.bmp?raw=true"><br>
+
 Music Composer<br>
-<img src="gitFiles/screen_29817.bmp?raw=true">
 <img src="gitFiles/screen_311869.bmp?raw=true"><br>
 3D renderer (OBJ files)<br>
 <img src="gitFiles/screen_21074.bmp?raw=true">
 <img src="gitFiles/screen_34278.bmp?raw=true"><br>
 Games (ARDUBOY NES GBC games) <br>
-<img src="gitFiles/screen_153126.bmp?raw=true"><br>
+<img src="gitFiles/test.nes18670.bmp?raw=true"><br>
 Wifi Spectrum<br>
 <img src="gitFiles/screen_246764.bmp?raw=true"><br>
 Partition  Viewer<br>
 <img src="gitFiles/screen_42323.bmp?raw=true"><br>
 Loan Calculator<br>
 <img src="gitFiles/screen_19291.bmp?raw=true"><br>
-
+And much More....
 
 
 
