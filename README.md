@@ -120,7 +120,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - ENTER is START button
 - BACKSPACE / DEL button is SELECT button
 - in emulator NES or GBC also "L" and "K" "1" and "2" and "WASD" keys suppurted
-
+- In GameBoy games Press 4 key to save state and 5 key to load save state ( hope for NES games too)
 ## Media Player
 - [ back 7 second
 - ] forward 7 second
