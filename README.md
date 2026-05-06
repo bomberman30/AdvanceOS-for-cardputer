@@ -19,8 +19,8 @@ Music Composer<br>
 <img src="gitFiles/screen_21074.bmp?raw=true">
 <img src="gitFiles/screen_34278.bmp?raw=true"><br>
 Games (ARDUBOY NES GBC games) <br>
-<img src="gitFiles/screen_18665.bmp?raw=true"><br>
-<img src="gitFiles/screen_13548.bmp?raw=true"><br>
+<img src="gitFiles/screen_18665.bmp?raw=true">  
+<img src="gitFiles/screen_13548.bmp?raw=true">  
 <img src="gitFiles/ArduboyGame104256116.bmp?raw=true"><br>
 
 Wifi Spectrum<br>
