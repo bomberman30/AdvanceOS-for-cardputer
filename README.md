@@ -12,17 +12,25 @@ Painter V2<br>
 <img src="gitFiles/PAint example2.bmp?raw=true"><br>
 Infrared Emitter And Editor<br>
 <img src="gitFiles/screen_52224.bmp?raw=true"><br>
-
+<br><br>
 Music Composer<br>
 <img src="gitFiles/screen_311869.bmp?raw=true"><br>
 3D renderer (OBJ files)<br>
 <img src="gitFiles/screen_21074.bmp?raw=true">
-<img src="gitFiles/screen_34278.bmp?raw=true"><br>
+<img src="gitFiles/screen_34278.bmp?raw=true">
+<br>
+<br>
 Games (ARDUBOY NES GBC games) <br>
 <img src="gitFiles/screen_18665.bmp?raw=true">  <img src="gitFiles/screen_13548.bmp?raw=true">  <img src="gitFiles/ArduboyGame104256116.bmp?raw=true"><br>
+<br><br>
+Notes<br>
+<img src="gitFiles/screen_410451.bmp?raw=true"><br>
 
+
+<br><br>
 Wifi Spectrum<br>
 <img src="gitFiles/screen_246764.bmp?raw=true"><br>
+<br><br>
 Partition  Viewer<br>
 <img src="gitFiles/screen_42323.bmp?raw=true"><br>
 Loan Calculator<br>
