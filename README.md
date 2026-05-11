@@ -46,7 +46,7 @@ Upcoming features include text viewing and editing, as well as image display cap
 # Supported Files
 
 * MP3 WAV : Music files
-* IR : Infrared code files (to emit infrared code)
+* IR : Infrared code files You can Emit IE signals from IF files,Create new infrared file, or edit IR file (change command name , or change specific signal, or delete specific signal)
 * GIF PNG JPEG BMP (24 Bit only): Picture files
 * TXT JSON CONF : Text files (i can add more files type if you like. you can ask in issues Section)
 * OBJ MTL : 3D Model files
