@@ -14,46 +14,38 @@
 #include <vector>
 
 #define IR_RECV_PIN 1
-#define IR_SEND_PIN 44
+#define IR_SEND_PIN 2
+#define COLOR_BG      0x0000
+#define COLOR_BAR     0x1082
+#define COLOR_GREEN   0x07E0
+#define COLOR_WHITE   0xFFFF
+#define COLOR_GRAY    0x8410
+#define COLOR_YELLOW  0xFFE0
+#define COLOR_RED     0xF800
+#define COLOR_DARK    0x18C3
 
-#define COLOR_BG TFT_BLACK
-#define COLOR_TEXT TFT_WHITE
-#define COLOR_SUCCESS 0x00FF66
-#define COLOR_WARNING 0xFFCC00
-#define COLOR_ACCENT 0xFF4422
-#define ITEM_H 28
-#define MENU_START_Y 28
-enum AppState
-{
-    STATE_MAIN_MENU,
-    STATE_CAPTURE,
-    STATE_SAVE_PROMPT,
-    STATE_CAPTURE_SAVE,
-    STATE_LIBRARY,
-    STATE_VIEW_CODE,
-    STATE_SD_BROWSER,
-    STATE_SEND_CONFIRM
+#define TOP_BAR_H    18
+#define SCREEN_W     240
+#define SCREEN_H     135
+#define SIGNAL_BOX_Y (TOP_BAR_H + 2)
+#define SIGNAL_BOX_H 44
+#define LIST_BOX_Y   (SIGNAL_BOX_Y + SIGNAL_BOX_H + 6)
+#define LIST_BOX_H   (SCREEN_H - LIST_BOX_Y - 3)
+#define LIST_START_Y (LIST_BOX_Y + 14)
+#define LIST_ROW_H   13
+#define LIST_VISIBLE ((LIST_BOX_H - 16) / LIST_ROW_H)
+
+struct IRFile {
+  String name;
+  String path;
 };
-
-struct IRSignal
-{
-    String name;
-    decode_type_t protocol;
-    uint64_t value;
-    uint16_t bits;
-    uint32_t frequency;
-    std::vector<uint16_t> rawData;
-    bool isRaw;
-    String filename;
-};
-
 class Cardputer_Remote : public GlobalParentClass
 {
 public:
     Cardputer_Remote(MyOS *os)
         : GlobalParentClass(os),
-          irRecv(IR_RECV_PIN),
-          irSend(IR_SEND_PIN)
+          irrecv(IR_RECV_PIN),
+          irsend(IR_SEND_PIN)
     {
     }
     void Begin() override;
@@ -61,76 +53,105 @@ public:
     void Loop() override;
     void Draw() override;
     void OnExit() override;
+decode_results results;
 
 private:
-      IRrecv irRecv;
-    IRsend irSend;
-    decode_results irResults;
-    AppState currentState = STATE_MAIN_MENU;
-    AppState previousState = STATE_MAIN_MENU;
-    IRSignal capturedSignal;
-    IRSignal selectedSignal;
-    std::vector<IRSignal> library;
-    std::vector<String> sdFiles;
+IRrecv irrecv;
+IRsend irsend;
 
-    int menuIndex = 0;
-    int libraryIndex = 0;
-    int sdFileIndex = 0;
-    int scrollOffset = 0;
-    bool capturing = false;
-    bool signalCaptured = false;
-    String inputText = "";
-    String statusMsg = "";
-    unsigned long statusTime = 0;
-    unsigned long lastCapture = 0;
-    unsigned long animTimer = 0;
-    bool needsRedraw = true;
+bool keyPressed(const Keyboard_Class::KeysState &ks, char c);
+// M5Cardputer'da OK/Enter tuşu tespiti
+// Klavyede ortadaki büyük tuş: key code 0x0D veya özel OK tuşu
+bool enterPressed(const Keyboard_Class::KeysState &ks);
 
-    const char *mainMenuItems[3] = {
-        "Capture IR Signal",
-        "My Library",
-        "SD Card Browser"};
-    const uint32_t menuColors[3] = {
-        0xFF4422,
-        0x0088FF,
-        0x00CC44};
-    const int MAIN_MENU_COUNT = 3;
+bool mountSD();
 
-    String myU64ToStr(uint64_t val);
+void scanIRFiles();
 
-    String myU64ToHex(uint64_t val);
+bool saveIRSignalNamed(const String &hex, const String &protocol,
+                       uint64_t value, const String &customName);
 
-    String protoName(decode_type_t p);
-    void setStatus(String msg);
-    bool initSD();
-    bool saveSignalToSD(IRSignal &sig);
-    bool loadSignalFromSD(String filename, IRSignal &sig);
-    void scanSDFiles();
-    void loadLibrary();
-    bool deleteFromSD(String fn);
-    bool sendIR(IRSignal &sig);
-    void drawTopBar(String title);
-    void drawToast();
-    void drawBottomBar(String hint);
-    void drawMainMenu();
-    void drawCaptureScreen();
-    void drawSavePrompt();
-    void drawSaveDialog();
-    void drawLibraryScreen();
-    void drawViewCodeScreen();
-    void drawSDBrowserScreen();
-    void drawSendConfirm(bool sending);
-    void drawScreen();
-    void handleIRReceive();
-    void handleMainMenu(char key);
-    void handleCapture(char key);
-    void handleSavePrompt(char key);
-    void handleSaveDialog(char key);
-    void handleLibrary(char key);
-    void handleViewCode(char key);
-    void handleSDBrowser(char key);
-    void handleSendConfirm(char key);
-    bool sdAvailable = true;
+
+
+
+// ─── IR ──────────────────────────────────────────────────────────────────────
+
+String decodeToHex(decode_results *res);
+
+bool sendIRFile(const String &path);
+
+// ─── Draw ────────────────────────────────────────────────────────────────────
+
+void drawTopBar();
+void drawStaticFrames();
+
+void redrawSignalContent();
+
+void redrawListContent();
+
+void fullRedraw();
+
+void drawSendFlash();
+
+void drawSaveFlash(bool ok);
+// ─── Naming screen ───────────────────────────────────────────────────────────
+
+void drawNamingScreenFull();
+
+void updateNamingInputBox();
+
+// ─── Setup ───────────────────────────────────────────────────────────────────
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+IRFile   irFiles[50];
+int      fileCount         = 0;
+int      selectedFile      = 0;
+int      scrollOffset      = 0;
+String   lastHex           = "";
+String   lastProtocol      = "";
+uint64_t lastValue         = 0;
+bool     newSignalReceived = false;
+bool     sdMounted         = false;
+
+unsigned long lastNewSignalTime = 0;
+
+String pendingSaveName = "";
+bool   namingMode      = false;
+
+unsigned long lastBlinkTime = 0;
+bool          blinkState    = false;
 };
 
 /* M5Cardputer.Keyboard.isKeyPressed('/');//right
