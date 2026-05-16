@@ -174,7 +174,17 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - [x] IR Sender Put IR files in sd card and send via the cardputer you can find IR files [here](https://github.com/Lucaslhm/Flipper-IRDB)
 - [X] IR Editor you can rename command name and edit the actual signal by connecting IR reciver to pin 1 (or use m5stack IR REMOTE chip) use names like UP, DOWN , UP, RIGHT,POWER, OK ,VOL+ VOL-, MUTE to make it appears as special key in the sender ( like arrows etc...) the special keys bind yo keys in the cardputer like the cardputer arrows
 - [x] Screenshot press Button G0 (on the top) to take a screenshot (will be saved in AdvanceOS folder)
-- [x] Custom theme you can create themes and select them ! enter "theme manager" You can add custom picture to every Menu download Preset theme here in the main repo folder put the  "Theme" folder in AdvanceOS folder, and Activate it in file explorer, you can edit the PNG files as you like and edit the theme file via the cardputer itself tha wallpaper must be in the theme folder and the name must be Wallpaper.png and size must be 240x135 , the apps icon must be same name of the apps in the menu and PNG size is 35x35
+- [x] You can create custom themes and select them through the Theme Manager. You can also add a custom picture to every menu.
+To use a preset theme, download the Theme folder from the main repository and place it inside the AdvanceOS folder. Then activate the theme through the File Explorer.
+You can edit the PNG files as you like, and you can also edit the theme file directly on the Cardputer.
+Please note the following requirements:
+The wallpaper must be inside the Theme folder
+The file name must be Wallpaper.png  
+Required size: 240×135 pixels
+App icons must have the exact same name as the apps in the menu
+Format: PNG  
+Required size: 35×35 pixels
+
 - [X] Games! you can Download Arduboy games or NES or GBC games (you need to put "Emulator.extension" file in "AdvanceOS" folder in your SD card) (put the games in "Games" folder in the root of the SD card to see the games in GAME menu, or just run the games via file explorer) if you install AdvanceOS via launcher you need to change partition type to anable the games to work!!!! the OS will ask it Automatic to change if you enter to Games in main menu.
 - you can add picture to a game in game menu!! 
 How to add:
