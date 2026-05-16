@@ -1,12 +1,15 @@
 # AdvanceOS
 <img src="gitFiles/screen_306602.bmp?raw=true">        <img src="gitFiles/screen_312781.bmp?raw=true">
 
+NEW themes: you can create Custom themes and reorgenize the icon order in the settings<br>
+<img src="gitFiles/screen_306602.bmp?raw=true"> ----> <img src="gitFiles/screen_32118.bmp?raw=true">
+<br><br>
 Music Player<br>
 <img src="gitFiles/screen_71496.bmp?raw=true"><br>
 File explorer <br>
 <img src="gitFiles/screen_97751.bmp?raw=true"><br>
 Painter V2<br>
-<img src="gitFiles/PainterV2.bmp?raw=true"><br>use bucket tool and premitive shapes<br>
+<img src="gitFiles/PainterV2.bmp?raw=true">  <img src="gitFiles/screen_40903.bmp?raw=true"><br>use bucket tool and premitive shapes<br>
 <img src="gitFiles/PAint example1.bmp?raw=true"><br>
 
 <img src="gitFiles/PAint example2.bmp?raw=true"><br>
@@ -21,7 +24,7 @@ Music Composer<br>
 <br>
 <br>
 Games (ARDUBOY NES GBC games) <br>
-<img src="gitFiles/screen_18665.bmp?raw=true">  <img src="gitFiles/screen_13548.bmp?raw=true">  <img src="gitFiles/ArduboyGame104256116.bmp?raw=true"><br>
+<img src="gitFiles/screen_18665.bmp?raw=true">  <img src="gitFiles/screen_13548.bmp?raw=true"> <img src="gitFiles/Mario Golf.gbc22988.bmp?raw=true"> <img src="gitFiles/Kirby's Dream Land 2.gb25907.bmp?raw=true">  <img src="gitFiles/ArduboyGame104256116.bmp?raw=true"><br>
 <br><br>
 Notes<br>
 <img src="gitFiles/screen_410451.bmp?raw=true"><br>
