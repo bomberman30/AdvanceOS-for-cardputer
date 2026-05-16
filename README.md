@@ -184,7 +184,7 @@ Required size: 240×135 pixels
 App icons must have the exact same name as the apps in the menu
 Format: PNG  
 Required size: 35×35 pixels
-
+(The Theme menu is slower with no animation because it allways load the Picture from the SD card, the cardputer don't have much RAM to store all the picture in the RAM)
 - [X] Games! you can Download Arduboy games or NES or GBC games (you need to put "Emulator.extension" file in "AdvanceOS" folder in your SD card) (put the games in "Games" folder in the root of the SD card to see the games in GAME menu, or just run the games via file explorer) if you install AdvanceOS via launcher you need to change partition type to anable the games to work!!!! the OS will ask it Automatic to change if you enter to Games in main menu.
 - you can add picture to a game in game menu!! 
 How to add:
