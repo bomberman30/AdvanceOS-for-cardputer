@@ -1,7 +1,7 @@
 # AdvanceOS
 <img src="gitFiles/screen_306602.bmp?raw=true">        <img src="gitFiles/screen_312781.bmp?raw=true">
 
-NEW themes: you can create Custom themes and reorgenize the icon order in the settings<br>
+NEW themes: you can create Custom themes and orgenize the icon's order in the settings<br>
 <img src="gitFiles/screen_306602.bmp?raw=true"> ----> <img src="gitFiles/screen_32118.bmp?raw=true">
 <br><br>
 Music Player<br>
