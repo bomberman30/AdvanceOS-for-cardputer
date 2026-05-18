@@ -173,7 +173,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - [x] Password Vault, Store all your passwords in encrypted file! (if you want to reset the vault, you must delete the file inside "AdvanceOS/Vault" folder, it will delete the stored passwords as well. so remember your vault password!)
 - [x] IR Sender Put IR files in sd card and send via the cardputer you can find IR files [here](https://github.com/Lucaslhm/Flipper-IRDB)
 - [X] IR Editor you can rename command name and edit the actual signal by connecting IR reciver to pin 1 (or use m5stack IR REMOTE chip) use names like UP, DOWN , UP, RIGHT,POWER, OK ,VOL+ VOL-, MUTE to make it appears as special key in the sender ( like arrows etc...) the special keys bind yo keys in the cardputer like the cardputer arrows
-- [x] New type of Infrared Reciver and sender (need to conncet reciver to pin 1 and sender to pin 2 , Or Use M5 IR REMOTE module, Big thanks to [abdullahlaptop23](https://github.com/abdullahlaptop23)
+- [x] New type of Infrared Reciver and sender (need to conncet reciver to pin 1 and sender to pin 2 , Or Use M5 IR REMOTE module, Big thanks to [MOY-lightening-firmware](https://github.com/MOY-lightening-firmware)
 - [x] Screenshot press Button G0 (on the top) to take a screenshot (will be saved in AdvanceOS folder)
 - [x] You can create custom themes and select them through the Theme Manager. You can also add a custom picture to every menu.
 To use a preset theme, download the Theme folder from the main repository and place it inside the AdvanceOS folder. Then activate the theme through the File Explorer.
