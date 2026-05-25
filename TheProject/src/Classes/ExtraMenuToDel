@@ -1,0 +1,51 @@
+#pragma once
+#include "./GlobalParentClass.h"
+#include <M5Cardputer.h>
+
+class Extra : public GlobalParentClass
+{
+private:
+public:
+    std::vector<String> *SlectedString;
+
+    Extra(MyOS *os) : GlobalParentClass(os) {}
+    ~Extra() {}
+
+    std::vector<String> menuItems = {
+#if defined(COMPILE_WIFI_THINGS)
+#endif
+#if defined(COMPILE_EMULATOR)
+        "emulator",
+#endif
+#if defined(COMPILE_WIFI_THINGS)
+        "Esp Projects Remote Control",
+        "Password Vault",
+#endif
+        "Step's Counter",
+        "Color Picker",
+        "Timer",
+        "Calculator",
+        "Theme Manager",
+        "GPIO Control",
+        "MIC Record to SD Card",
+        "Partition Viewer",
+        "Wifi Spectrum",
+        "Wake Me Up (Alarm Clock)",
+        "Create New Infrared File",
+        "Loan Calculator",
+        "Unit AudioPlayer N9301",
+    };
+
+    int MenuIdFocus = 0;
+    float cameraY = 0;
+    float targetCameraY = 0;
+    int DistanceBetweenTXT = 25;
+    bool showingInfo = false;
+
+    String GetDescription(String itemName);
+
+    void Begin() override;
+    void Loop() override;
+    void Draw() override;
+    void DrawInfo();
+};
