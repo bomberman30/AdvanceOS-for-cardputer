@@ -133,6 +133,37 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - BACKSPACE / DEL button is SELECT button
 - in emulator NES or GBC also "L" and "K" "1" and "2" and "WASD" keys suppurted
 - In GameBoy games and NES games Press 4 key to save the current state and 5 key to load save state
+# importent how to anable games if advanceOS installed on  launcher version 2.7.0 and up!!
+
+(if you install advanceOS directly from m5 burner the game will work fine! no modify nedded)
+Starting from Launcher version 2.7.0 and up, you must modify the partitions from within the launcher itself to enable game support.
+
+Step 1: Recommended — delete all existing partitions
+Open PMan from the menu.
+All white lines represent partitions — select each one (except "FREE") and choose Remove.
+Then select Apply Changes.
+When prompted to restart, reboot the Cardputer.
+
+Step 2: Install AdvanceOS
+Install AdvanceOS.bin from the SD card as you normally would.
+
+Step 3: Delete the SPIFFS partition again
+Return to PMan and remove the SPIFFS partition the same way as in Step 1.
+
+Step 4: Create a new OTA partition
+Open PMan again, select FREE, then choose Add OTA.
+Use the arrow keys until you see End, then press Enter.
+Move the end handle (the right handle) to the left until the size is 1MB.
+Press Enter again and select Confirm.
+
+Step 5: Create a new SPIFFS partition
+In PMan, click FREE again and choose Add SPIFFS.
+Keep the default name spiffs (just press OK).
+Allocate as much space as possible — this is where your ROM files will be stored.
+In Launcher version 2.7.2, SPIFFS automatically uses all available free space by default.
+
+
+
 ## Media Player
 - [ back 7 second
 - ] forward 7 second
