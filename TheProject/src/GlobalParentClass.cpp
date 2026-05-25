@@ -1,7 +1,7 @@
 #include "GlobalParentClass.h"
 #include <M5Cardputer.h>
 #include "./MyOS.h"
-#include "Classes/MainMenu.h"
+#include "Classes/MainMenuV2.h"
 void GlobalParentClass::Begin()
 {
 }
@@ -17,5 +17,6 @@ void GlobalParentClass::OnExit()
 }
 void GlobalParentClass::BackToMainMenu()
 {
-    mainOS->ChangeMenu(new MainMenu(mainOS));
+    mainOS->ChangeMenu(new MainMenuV2(mainOS));
+    return;
 }

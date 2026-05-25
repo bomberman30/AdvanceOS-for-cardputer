@@ -16,5 +16,6 @@ public:
     virtual void OnExit();
 
     void BackToMainMenu();
+    bool AddWillBeDeleted=false;
 private:
 };

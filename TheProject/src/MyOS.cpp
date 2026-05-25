@@ -1,6 +1,6 @@
 
 #include "MyOS.h"
-#include "Classes/MainMenu.h"
+#include "Classes/MainMenuV2.h"
 #include <Preferences.h>
 Preferences prefsForRestart;
 #include "Fonts/Ariel12.h"
@@ -114,7 +114,36 @@ String getHeapInfoKB()
     // s += "Heap Free : " + String(free  / 1024) + " KB";
     return s;
 }
+char MyOS::AskForAnyKey(String prompt)
+{
+    while (true)
+    {
+        M5Cardputer.update();
 
+        sprite.createSprite(SCREEN_W, SCREEN_H);
+        sprite.fillSprite(TFT_BLACK);
+        sprite.setTextSize(1);
+        sprite.setTextColor(TFT_WHITE);
+        DrawWordWrap(sprite, prompt, 10, 20, 220, 12);
+        sprite.setTextColor(TFT_DARKGREY);
+        sprite.setCursor(10, 100);
+        sprite.print("BKSP = cancel");
+        sprite.pushSprite(0, 0);
+        sprite.deleteSprite();
+
+        if (M5Cardputer.Keyboard.isChange() && M5Cardputer.Keyboard.isPressed())
+        {
+            Keyboard_Class::KeysState status = M5Cardputer.Keyboard.keysState();
+
+            if (status.del) return 0; // cancelled
+            if (status.enter) return KEY_ENTER; 
+
+            if (!status.word.empty())
+                return status.word[0];
+        }
+        delay(10);
+    }
+}
 bool MyOS::AskSomthing(String Question)
 {
     bool TheUserAnswer = false;
@@ -143,7 +172,7 @@ bool MyOS::AskSomthing(String Question)
         sprite.setTextColor(RED);
         sprite.print("N");
 
-        sprite.pushSprite(0, TopBarYsize);
+        sprite.pushSprite(0, 0);
 
         sprite.deleteSprite();
         M5Cardputer.update();
@@ -163,7 +192,7 @@ bool MyOS::AskSomthing(String Question)
     return theAnswer;
 }
 
-String MyOS::AskFromUserForString(String Question, bool NoSpecialChar, bool PasswordMode)
+String MyOS::AskFromUserForString(String Question, bool NoSpecialChar, bool PasswordMode, bool OnlyDigit)
 {
     String UserInput = "";
     bool Finished = false;
@@ -203,7 +232,7 @@ String MyOS::AskFromUserForString(String Question, bool NoSpecialChar, bool Pass
         sprite.setCursor(10, 85);
         sprite.setTextColor(BLUE);
         sprite.print("Press ENTER to confirm");
-        sprite.pushSprite(0, TopBarYsize);
+        sprite.pushSprite(0, 0);
         sprite.deleteSprite();
 
         if (M5Cardputer.Keyboard.isChange())
@@ -222,6 +251,13 @@ String MyOS::AskFromUserForString(String Question, bool NoSpecialChar, bool Pass
                     if (NoSpecialChar)
                     {
                         if (isAlphaNumeric(i) || i == '_' || i == '-' || i == ' ')
+                        {
+                            UserInput += i;
+                        }
+                    }
+                    else if (OnlyDigit)
+                    {
+                        if (isDigit(i))
                         {
                             UserInput += i;
                         }
@@ -262,8 +298,9 @@ int MyOS::AskForColor(String Question, uint16_t DefaultColor)
     b = (b * 255) / 31;
 
     // color (Presets)
-    uint16_t presetColors[] = {RED, YELLOW, BLUE, PURPLE, WHITE, BLACK, MAROON, GREEN, BROWN, PINK};
-    char *presetLabels[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"};
+    int PreviwColorsCount = 12;
+    uint16_t presetColors[PreviwColorsCount] = {BLACK, WHITE, SILVER, RED, YELLOW, BLUE, PURPLE, MAROON, GREEN, BROWN, PINK, CYAN, DARKCYAN};
+    char presetLabels[PreviwColorsCount] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'q', 'w', 'e'};
 
     int selectedBar = 0;
     bool confirmed = false;
@@ -280,14 +317,14 @@ int MyOS::AskForColor(String Question, uint16_t DefaultColor)
         sprite.setTextColor(WHITE, BLACK);
         // sprite.setCursor(10, 5);
         // sprite.print(Question);
-        DrawWordWrap(sprite, Question, 10, 5, 220, 12);
+        DrawWordWrap(sprite, Question, 10, 1, 220, 12);
         const char *names[3] = {"R", "G", "B"};
         uint8_t *values[3] = {&r, &g, &b};
         uint16_t barColors[3] = {RED, GREEN, BLUE};
 
         for (int i = 0; i < 3; i++)
         {
-            int y = 25 + (i * 20);
+            int y = 12 + (i * 12);
             sprite.setTextColor(i == selectedBar ? YELLOW : WHITE, BLACK);
             sprite.setCursor(5, y);
             sprite.print(i == selectedBar ? ">" : " ");
@@ -297,17 +334,19 @@ int MyOS::AskForColor(String Question, uint16_t DefaultColor)
             sprite.fillRect(71, y + 1, (int)(*values[i] * 0.6), 10, barColors[i]);
         }
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < PreviwColorsCount; i++)
         {
-            int xPos = 2 + (i * 21);
+            int xPos = 2 + (i * 15);
             int yPos = 80;
-            sprite.fillRect(xPos, yPos, 18, 12, presetColors[i]);
-            sprite.drawRect(xPos, yPos, 18, 12, WHITE);
+            sprite.fillRect(xPos, yPos, 13, 12, presetColors[i]);
+            sprite.drawRect(xPos, yPos, 13, 12, WHITE);
 
             sprite.setTextColor(WHITE, BLACK);
             sprite.setCursor(xPos + 6, yPos - 10);
             sprite.print(presetLabels[i]);
         }
+        sprite.setCursor(10, 50);
+        sprite.print("Press Key To Quick Color Select");
         sprite.setCursor(10, 100);
         sprite.print("Press Arrows to select ENTER To Select");
         /*      char hexBuf[10];
@@ -316,13 +355,13 @@ int MyOS::AskForColor(String Question, uint16_t DefaultColor)
              sprite.setCursor(10, 85);
              sprite.printf("HEX: %s  INT: %d", hexBuf, currentColor);
       */
-        sprite.pushSprite(0, TopBarYsize);
+        sprite.pushSprite(0, 0);
         sprite.deleteSprite();
 
         // input hanlde
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < PreviwColorsCount; i++)
         {
-            if (NewKey.ifKeyJustPress('1' + i))
+            if (NewKey.ifKeyJustPress(presetLabels[i]))
             {
                 uint16_t pCol = presetColors[i];
                 r = ((pCol >> 11) & 0x1F) * 255 / 31;
@@ -355,8 +394,40 @@ int MyOS::AskForColor(String Question, uint16_t DefaultColor)
     return M5Cardputer.Display.color565(r, g, b);
 }
 
+void MyOS::AddFilePathToArrayOfMAinMenu(String Path)
+{
+    // בדיקה שהנתיב לא כבר קיים
+    for (const String &p : filesInMainMenu)
+        if (p == Path)
+        {
+            ShowOnScreenMessege("File Alredy In Main Menu");
+            return;
+        }
+
+    filesInMainMenu.push_back(Path);
+    ShowOnScreenMessege("File Added To Main Menu", 1000);
+    saveSettings();
+}
+
+void MyOS::RemoveFilePathFromArrayOfMAinMenu(String Path)
+{
+    for (int i = 0; i < (int)filesInMainMenu.size(); i++)
+    {
+        if (filesInMainMenu[i] == Path)
+        {
+            filesInMainMenu.erase(filesInMainMenu.begin() + i);
+            ShowOnScreenMessege("File Removed From Main Menu", 1000);
+            saveSettings();
+            return;
+        }
+    }
+    ShowOnScreenMessege("File Not Exist in Main Menu", 3000);
+}
+
 void MyOS::begin()
 {
+
+    rtc.setTime(0, 0, 0, 1, 1, 2025); // או לסנכרן דרך NTP
     // app load code
     prefsForRestart.begin("app", true);
     LastAppInstalledPath = prefsForRestart.getString("AppLoadedPath", "");
@@ -427,6 +498,10 @@ void MyOS::begin()
         ShowOnScreenMessege("you don't have SD card Most Of The Functions will Not Work Or The OS will Crush in some menu", 10000);
     }
     loadSettings();
+    if (CurrentThemeSelectedPath != "")
+    {
+        LoadTheme(CurrentThemeSelectedPath);
+    }
     M5Cardputer.Display.setBrightness(brightness);
     // SPI.end();
     //  M5.Imu.begin();
@@ -460,7 +535,7 @@ void MyOS::begin()
         SetFastBootVar(0);
         //  saveSettings();
 
-        currentApp = new MainMenu(this);
+        currentApp = new MainMenuV2(this);
         currentApp->TopOffset = TopBarYsize;
         currentApp->Begin();
     }
@@ -519,18 +594,44 @@ void MyOS::begin()
     else if (loadFastBootVar() == 7) // boot to GamesV2
     {
         showTopBar = false;
-        currentMenuIndex = 5; // to fix if wrong index
+        currentMenuIndex = 7; // to fix if wrong index
         SetFastBootVar(0);
         //  saveSettings();
         currentApp = new GamesV2(this);
         currentApp->TopOffset = TopBarYsize;
         currentApp->Begin();
     }
-
-    if (CurrentThemeSelectedPath != "")
+    else if (loadFastBootVar() == 8) // alarm Clock fast boot
     {
-        LoadTheme(CurrentThemeSelectedPath);
+        bool Play = true;
+        SetFastBootVar(0);
+        ShowOnScreenMessege("To Stop The Alarm Press Restart Or Use Turn Off Switch", 2);
+        for (int vol = 10; vol <= 150; vol += 15)
+        {
+            M5Cardputer.Speaker.setVolume(vol); // הגדרת עוצמה (0-255)
+
+            for (int i = 0; i < 3; i++)
+            {
+
+                M5Cardputer.Speaker.tone(1000, 100); // צפצוף קצר בתדר גבוה
+                delay(150);
+
+                M5Cardputer.Speaker.tone(1500, 100); // צפצוף שני בטון שונה (נשמע כמו אזעקה)
+                delay(150);
+            }
+        }
+        for (int i = 0; i < 7; i++)
+        {
+
+            M5Cardputer.Speaker.tone(1000, 100); // צפצוף קצר בתדר גבוה
+            delay(150);
+
+            M5Cardputer.Speaker.tone(1500, 100); // צפצוף שני בטון שונה (נשמע כמו אזעקה)
+            delay(150);
+        }
+        esp_deep_sleep_start();
     }
+
     // String ff=AskFromUserForString("what the file name?");
     // ShowOnScreenMessege(ff,10000);
 }
@@ -540,6 +641,7 @@ void MyOS::loop()
     // screen dim timer
     if (M5Cardputer.Keyboard.isPressed())
     {
+        TurnOffTimer = 0;
         DimTimer = 0;
         // lastInputTime = millis();
         if (screenOff)
@@ -548,17 +650,46 @@ void MyOS::loop()
             screenOff = false;
         }
     }
+
+    if (NewKey.ApplyPushedKeyEveryMS('-', 20)) // volume down
+    {
+        // uint8_t v = mainOS->volume;
+
+        volume -= 3;
+        if (volume <= 0)
+        {
+            volume = 0;
+        }
+        M5Cardputer.Speaker.setVolume(volume);
+        //  outRes->SetGain(M5.Speaker.getVolume() / 255.0);
+    }
+    if (NewKey.ApplyPushedKeyEveryMS('=', 20)) // volume up
+    {
+        // uint8_t v = M5.Speaker.getVolume();
+
+        volume += 3;
+        if (volume >= 255)
+        {
+            volume = 255;
+        }
+        M5.Speaker.setVolume(volume);
+        // outRes->SetGain(M5.Speaker.getVolume() / 255.0);
+    }
     // takein screenshot of the screen
-    if (M5Cardputer.Keyboard.isKeyPressed(KEY_FN) && M5Cardputer.Keyboard.isKeyPressed('s'))
+    if (M5Cardputer.BtnA.wasPressed())
     {
         SD.mkdir("/AdvanceOS/Screenshots");
 
         if (saveScreenshot("/AdvanceOS/Screenshots/screen_" + String(millis()) + ".bmp"))
         {
-            ShowOnScreenMessege("image Saved in \"AdvanceOS->Screenshots\" folder", 2000);
+            ShowOnScreenMessege("image Saved in \"AdvanceOS\\Screenshots\" folder", 2000);
         }
     }
 
+    if (TurnOffTimer > TimeToTurnOff)
+    {
+        esp_deep_sleep_start();
+    }
     // if time pass turn off the display
     if (DimTimer > ScreenDimInTimeSecond && !screenOff)
     {
@@ -581,6 +712,7 @@ void MyOS::loop()
     // if old class Marked to delete... delete it!!, free memory
     if (appToDelete != nullptr)
     {
+        appToDelete->OnExit();
         delete appToDelete;
         appToDelete = nullptr;
         // Serial.println("Memory Cleaned Up Safely");
@@ -620,11 +752,13 @@ void MyOS::ChangeMenu(GlobalParentClass *newApp)
     sprite.deleteSprite();
     sprite2.deleteSprite();
     sprite3.deleteSprite();
-    sprite4.deleteSprite();
+    // sprite4.deleteSprite();
     if (currentApp != nullptr)
     {
-        currentApp->OnExit();
+        // currentApp->OnExit();
         appToDelete = currentApp; // mark the app to delete after the finish of the loop
+
+        currentApp->AddWillBeDeleted = true;
     }
     /*     if (CurrentMusic == nullptr)
         {
@@ -635,6 +769,7 @@ void MyOS::ChangeMenu(GlobalParentClass *newApp)
         currentApp->Begin();
     currentApp->TopOffset = TopBarYsize;
     showTopBar = currentApp->showTopBar;
+    sprite.setTextDatum(TL_DATUM);
 }
 void MyOS::EnterMusicPlayer(bool Focus)
 {
@@ -642,12 +777,12 @@ void MyOS::EnterMusicPlayer(bool Focus)
     sprite.deleteSprite();
     sprite2.deleteSprite();
     sprite3.deleteSprite();
-    sprite4.deleteSprite();
-    if (currentApp != nullptr)
-    {
-        currentApp->OnExit();
-        // appToDelete = currentApp;// mark the app to delete after the finish of the loop
-    }
+    // sprite4.deleteSprite();
+    /*   if (currentApp != nullptr)
+      {
+          //currentApp->OnExit();
+          // appToDelete = currentApp;// mark the app to delete after the finish of the loop
+      } */
     if (CurrentMusic == nullptr)
     {
         CurrentMusic = new MusicPlayerV2(this);
@@ -704,32 +839,14 @@ void MyOS::LoadTheme(String path, bool SetAsDefault)
         return;
     }
 
-    TOP_BAR_COLOR_1 = doc["TOP_BAR_COLOR_1"] | 0x5800;
-    TOP_BAR_COLOR_2 = doc["TOP_BAR_COLOR_2"] | 0x7800;
+    BAR_COLOR_1 = doc["BAR_COLOR_1"] | 0x1C5F;
+    BAR_COLOR_2 = doc["BAR_COLOR_2"] | ILI9341_NAVY;
 
-    MENU_1_MUSIC_COLOR_1 = doc["MENU_1_MUSIC_COLOR_1"] | 0xFE00;
-    MENU_1_MUSIC_COLOR_2 = doc["MENU_1_MUSIC_COLOR_2"] | 0x0000;
+    BAR_TEXT_COLOR = doc["BAR_TEXT_COLOR"] | 0xFFFF;
+    BACKGROUND_COLOR = doc["BACKGROUND_COLOR"] | BLACK;
 
-    MENU_2_FILES_COLOR_1 = doc["MENU_2_FILES_COLOR_1"] | 0x0000;
-    MENU_2_FILES_COLOR_2 = doc["MENU_2_FILES_COLOR_2"] | 0xFE00;
+    ShowWallpaperInMainMenu = doc["ShowWallpaperInMainMenu"] | true;
 
-    MENU_3_BOT_COLOR_1 = doc["MENU_3_BOT_COLOR_1"] | 0xFFFF;
-    MENU_3_BOT_COLOR_2 = doc["MENU_3_BOT_COLOR_2"] | 0x012C;
-
-    MENU_4_NOTES_COLOR_1 = doc["MENU_4_NOTES_COLOR_1"] | 0x7006;
-    MENU_4_NOTES_COLOR_2 = doc["MENU_4_NOTES_COLOR_2"] | 0xE10C;
-
-    MENU_4_PAINT_COLOR_1 = doc["MENU_4_PAINT_COLOR_1"] | 0xFE00;
-    MENU_4_PAINT_COLOR_2 = doc["MENU_4_PAINT_COLOR_2"] | 0x012C;
-
-    MENU_5_EXTRA_COLOR_1 = doc["MENU_5_EXTRA_COLOR_1"] | 0x0002;
-    MENU_5_EXTRA_COLOR_2 = doc["MENU_5_EXTRA_COLOR_2"] | 0xFE80;
-
-    MENU_6_GAMES_COLOR_1 = doc["MENU_6_GAMES_COLOR_1"] | 0x2E9B;
-    MENU_6_GAMES_COLOR_2 = doc["MENU_6_GAMES_COLOR_2"] | 0x006B;
-
-    MENU_7_SETTINGS_COLOR_1 = doc["MENU_7_SETTINGS_COLOR_1"] | 0x8122;
-    MENU_7_SETTINGS_COLOR_2 = doc["MENU_7_SETTINGS_COLOR_2"] | 0x1820;
     if (SetAsDefault)
     {
         CurrentThemeSelectedPath = path;
@@ -739,11 +856,6 @@ void MyOS::LoadTheme(String path, bool SetAsDefault)
 bool MyOS::SaveCurrentTheme(String Custom_path)
 {
 
-    /*     if (!SD.begin())
-        {
-            Serial.println("SD init failed");
-            return false;
-        } */
     String Path = "";
 
     if (Custom_path == "") // no specipic path
@@ -762,36 +874,42 @@ bool MyOS::SaveCurrentTheme(String Custom_path)
         Path += ".thm"; // file in the theme folder}
     }
     JsonDocument Theme;
-    Theme["TOP_BAR_COLOR_1"] = TOP_BAR_COLOR_1;
-    Theme["TOP_BAR_COLOR_2"] = TOP_BAR_COLOR_2;
+    Theme["BAR_COLOR_1"] = BAR_COLOR_1;
+    Theme["BAR_COLOR_2"] = BAR_COLOR_2;
+    Theme["BAR_TEXT_COLOR"] = BAR_TEXT_COLOR;
+    Theme["BACKGROUND_COLOR"] = BACKGROUND_COLOR;
+    Theme["ShowWallpaperInMainMenu"] = ShowWallpaperInMainMenu;
+    /*     Theme["MENU_1_MUSIC_COLOR_1"] = MENU_1_MUSIC_COLOR_1;
+        Theme["MENU_1_MUSIC_COLOR_2"] = MENU_1_MUSIC_COLOR_2;
 
-    Theme["MENU_1_MUSIC_COLOR_1"] = MENU_1_MUSIC_COLOR_1;
-    Theme["MENU_1_MUSIC_COLOR_2"] = MENU_1_MUSIC_COLOR_2;
+        Theme["MENU_2_FILES_COLOR_1"] = MENU_2_FILES_COLOR_1;
+        Theme["MENU_2_FILES_COLOR_2"] = MENU_2_FILES_COLOR_2;
 
-    Theme["MENU_2_FILES_COLOR_1"] = MENU_2_FILES_COLOR_1;
-    Theme["MENU_2_FILES_COLOR_2"] = MENU_2_FILES_COLOR_2;
+        Theme["MENU_3_BOT_COLOR_1"] = MENU_3_BOT_COLOR_1;
+        Theme["MENU_3_BOT_COLOR_2"] = MENU_3_BOT_COLOR_2;
 
-    Theme["MENU_3_BOT_COLOR_1"] = MENU_3_BOT_COLOR_1;
-    Theme["MENU_3_BOT_COLOR_2"] = MENU_3_BOT_COLOR_2;
+        Theme["MENU_4_NOTES_COLOR_1"] = MENU_4_NOTES_COLOR_1;
+        Theme["MENU_4_NOTES_COLOR_2"] = MENU_4_NOTES_COLOR_2;
 
-    Theme["MENU_4_NOTES_COLOR_1"] = MENU_4_NOTES_COLOR_1;
-    Theme["MENU_4_NOTES_COLOR_2"] = MENU_4_NOTES_COLOR_2;
+        Theme["MENU_4_PAINT_COLOR_1"] = MENU_4_PAINT_COLOR_1;
+        Theme["MENU_4_PAINT_COLOR_2"] = MENU_4_PAINT_COLOR_2;
 
-    Theme["MENU_4_PAINT_COLOR_1"] = MENU_4_PAINT_COLOR_1;
-    Theme["MENU_4_PAINT_COLOR_2"] = MENU_4_PAINT_COLOR_2;
+        Theme["MENU_4_COMPOSER_COLOR_1"] = MENU_4_COMPOSER_COLOR_1;
+        Theme["MENU_4_COMPOSER_COLOR_2"] = MENU_4_COMPOSER_COLOR_2;
 
-    Theme["MENU_5_EXTRA_COLOR_1"] = MENU_5_EXTRA_COLOR_1;
-    Theme["MENU_5_EXTRA_COLOR_2"] = MENU_5_EXTRA_COLOR_2;
+        Theme["MENU_5_EXTRA_COLOR_1"] = MENU_5_EXTRA_COLOR_1;
+        Theme["MENU_5_EXTRA_COLOR_2"] = MENU_5_EXTRA_COLOR_2;
 
-    Theme["MENU_7_SETTINGS_COLOR_1"] = MENU_7_SETTINGS_COLOR_1;
-    Theme["MENU_7_SETTINGS_COLOR_2"] = MENU_7_SETTINGS_COLOR_2;
+        Theme["MENU_7_SETTINGS_COLOR_1"] = MENU_7_SETTINGS_COLOR_1;
+        Theme["MENU_7_SETTINGS_COLOR_2"] = MENU_7_SETTINGS_COLOR_2; */
     File file;
     if (Custom_path == "")
     {
         file = SD.open(Path, FILE_WRITE);
         if (!file)
         {
-            Serial.println("Failed to open file");
+
+            ShowOnScreenMessege("Failed to open file");
             return false;
         }
     }
@@ -800,7 +918,7 @@ bool MyOS::SaveCurrentTheme(String Custom_path)
         file = SD.open(Custom_path, FILE_WRITE);
         if (!file)
         {
-            Serial.println("Failed to open file");
+            ShowOnScreenMessege("Failed to open file");
             return false;
         }
     }
@@ -816,35 +934,17 @@ void MyOS::ResetToDefaultTheme()
     {
         ShowOnScreenMessege("Dafault Theme Alredy Selected", 2000);
         return;
-    } 
-    TOP_BAR_COLOR_1 = 0x5800;
-    TOP_BAR_COLOR_2 = 0x7800;
+    }
+    BAR_COLOR_1 = 0x1C5F;
+    BAR_COLOR_2 = ILI9341_NAVY;
 
-    MENU_1_MUSIC_COLOR_1 = 0xFE00;
-    MENU_1_MUSIC_COLOR_2 = 0x0000;
+    BAR_TEXT_COLOR = 0xFFFF;
+    BACKGROUND_COLOR = BLACK;
+    ShowWallpaperInMainMenu = true;
 
-    MENU_2_FILES_COLOR_1 = 0x0000;
-    MENU_2_FILES_COLOR_2 = 0xFE00;
-
-    MENU_3_BOT_COLOR_1 = 0xFFFF;
-    MENU_3_BOT_COLOR_2 = 0x012C;
-
-    MENU_4_NOTES_COLOR_1 = 0x7006;
-    MENU_4_NOTES_COLOR_2 = 0xE10C;
-    MENU_4_PAINT_COLOR_1 = 0xFE00;
-    MENU_4_PAINT_COLOR_2 = 0x012C;
-    MENU_5_EXTRA_COLOR_1 = 0x0002;
-    MENU_5_EXTRA_COLOR_2 = 0xFE80;
-
-    MENU_6_GAMES_COLOR_1 = 0x2E9B;
-    MENU_6_GAMES_COLOR_2 = 0x006B;
-
-    MENU_7_SETTINGS_COLOR_1 = 0x8122;
-    MENU_7_SETTINGS_COLOR_2 = 0x1820;
     CurrentThemeSelectedPath = "";
 
-        saveSettings();
-
+    saveSettings();
 }
 void MyOS::SetFontForSprite(M5Canvas &spriteReff)
 {
@@ -922,77 +1022,140 @@ void MyOS::SampleGyroscope()
     CardputerRotationY += gy * deltaTime;
 }
 
+// צבעים
+
+#define XP_RED RED
+#define XP_GREEN GREEN
+#define XP_BLUE BLUE
+#define XP_YELLOW YELLOW
+
 void MyOS::UpdateTopBar()
 {
     if (!showTopBar)
-    {
         return;
-    }
-    int HalfTopBar = TopBarYsize / 2;
 
     TopBarSprite.createSprite(240, TopBarYsize);
-    TopBarSprite.fillRect(0, 0, 240, HalfTopBar, TOP_BAR_COLOR_1);
-    TopBarSprite.fillRect(0, HalfTopBar, 240, HalfTopBar, TOP_BAR_COLOR_2);
 
-    // TopBarSprite.drawRect(2,2,236,TopBarYsize-4,BLACK);
-    TopBarSprite.setTextColor(BLACK);
-    TopBarSprite.setTextWrap(false);
-    if (StepCounterWork)
-    {
-        TopBarSprite.setCursor(40, 7);
-        String s = "Steps ";
-        s += String(steps);
-        TopBarSprite.print(s);
-    }
+    // --- רקע 2 צבעים ---
+    int half = TopBarYsize / 2;
+    TopBarSprite.fillRect(0, 0, 240, half, BAR_COLOR_1);
+    TopBarSprite.fillRect(0, half, 240, TopBarYsize - half, BAR_COLOR_2);
 
-    // int batteryPercent;
-    // batary sector
+    // --- פס שחור עליון ---
+    TopBarSprite.drawFastHLine(0, 0, 240, TFT_BLACK);
+
+    // =====================
+    // צד שמאל: 4 ריבועים (2x2) + "advanceOS"
+    // =====================
+    int sqSize = (TopBarYsize / 2) - 3;
+    int sqGap = 1;
+    int sqX = 3;
+    int sqY1 = 2;
+    int sqY2 = sqY1 + sqSize + sqGap;
+
+    uint16_t colors[4] = {XP_RED, XP_GREEN, XP_BLUE, XP_YELLOW};
+
+    TopBarSprite.fillRect(sqX, sqY1, sqSize, sqSize, colors[0]);
+    TopBarSprite.drawRect(sqX, sqY1, sqSize, sqSize, 0x2104);
+    TopBarSprite.fillRect(sqX + sqSize + sqGap, sqY1, sqSize, sqSize, colors[1]);
+    TopBarSprite.drawRect(sqX + sqSize + sqGap, sqY1, sqSize, sqSize, 0x2104);
+
+    TopBarSprite.fillRect(sqX, sqY2, sqSize, sqSize, colors[2]);
+    TopBarSprite.drawRect(sqX, sqY2, sqSize, sqSize, 0x2104);
+    TopBarSprite.fillRect(sqX + sqSize + sqGap, sqY2, sqSize, sqSize, colors[3]);
+    TopBarSprite.drawRect(sqX + sqSize + sqGap, sqY2, sqSize, sqSize, 0x2104);
+
+    // כיתוב "advanceOS"
+    int textX = sqX + 2 * (sqSize + sqGap) + 3;
+    int textY = (TopBarYsize - 8) / 2;
+
+    TopBarSprite.setTextColor(0x2124);
+    TopBarSprite.setCursor(textX + 1, textY + 1);
+    TopBarSprite.print("AdvanceOS");
+
+    TopBarSprite.setTextColor(BAR_TEXT_COLOR);
+    TopBarSprite.setCursor(textX, textY);
+    TopBarSprite.print("AdvanceOS");
+
+    // =====================
+    // עדכון סוללה
+    // =====================
     if (BatteryUpdateTimer > 20)
     {
         batteryPercent = M5Cardputer.Power.getBatteryLevel();
         BatteryUpdateTimer = 0;
     }
-    int vXb = 227;
-    int vYb = 4;
-    int vWb = 11;
-    int vHb = 15;
 
-    TopBarSprite.drawRect(vXb, vYb, vWb, vHb, BLACK);
-    TopBarSprite.fillRect(229, 2, 7, 2, BLACK);
+    // =====================
+    // צד ימין: Battery
+    // =====================
+    int vXb = 227;
+    int vYb = (TopBarYsize - 10) / 2;
+    int vWb = 8;
+    int vHb = 12;
+
+    TopBarSprite.drawRect(vXb, vYb, vWb, vHb, BAR_TEXT_COLOR);
+    TopBarSprite.fillRect(vXb + 2, vYb - 2, 4, 2, BAR_TEXT_COLOR);
 
     int fillHb = map(batteryPercent, 0, 100, 0, vHb - 2);
-
+    // 🔴 שינוי: צבע מילוי לבן תמיד (עם אדום בלבד כשנמוך)
+    uint16_t batColor = (batteryPercent > 20) ? BAR_TEXT_COLOR : 0xF800;
     TopBarSprite.fillRect(
         vXb + 1,
         vYb + (vHb - 1 - fillHb),
         vWb - 2,
         fillHb,
-        DARKGREEN);
+        batColor);
 
-    TopBarSprite.setCursor(202, 7);
+    TopBarSprite.setTextColor(BAR_TEXT_COLOR);
     String BatteryStatus = String(batteryPercent) + "%";
+    int batTextX = vXb - (BatteryStatus.length() * 6) - 2;
+    TopBarSprite.setCursor(batTextX, (TopBarYsize - 8) / 2);
     TopBarSprite.print(BatteryStatus);
 
-    drawImageTransparent(177, 1, 19, 17, SpeakerIcon, [&](int x, int y, uint16_t c)
-                         { TopBarSprite.drawPixel(x, y, c); }, 0xF800);
-    // Volume bar vertical
-    int vX = 170;
-    int vY = 1;
-    int vW = 6;
-    int vH = 18;
+    // =====================
+    // צד ימין: Volume
+    // =====================
+    int vX = batTextX - 12;
+    int vY = 2;
+    int vW = 5;
+    int vH = TopBarYsize - 4;
 
-    //
-    TopBarSprite.drawRect(vX, vY, vW, vH, BLACK);
-
+    TopBarSprite.drawRect(vX, vY, vW, vH, BAR_TEXT_COLOR);
     int fillH = map(volume, 0, 255, 0, vH - 2);
-
-    //
+    // 🔴 שינוי: צבע מילוי לבן (היה צהוב 0xFFE0)
     TopBarSprite.fillRect(
         vX + 1,
         vY + (vH - 1 - fillH),
         vW - 2,
         fillH,
-        YELLOW);
+        BAR_TEXT_COLOR);
+
+    drawImageTransparent(vX - 20, 0, 20, 20, SpeakerIcon, [&](int x, int y, uint16_t c)
+                         { TopBarSprite.drawPixel(x, y, c); }, 0xF800);
+
+    // =====================
+    // 🆕 שעון - מרכז הבר
+    // =====================
+    String timeStr = rtc.getTime("%H:%M:%S");
+
+    // מחשב מיקום מרכזי מתחת ל-advanceOS
+    int clockX = 140 - (timeStr.length() * 3); // ~מרכז ל-font רוחב 6px
+    int clockY = (TopBarYsize - 8) / 2;
+
+    // צל
+    TopBarSprite.setTextColor(0x2124);
+    TopBarSprite.setCursor(clockX + 1, clockY + 1);
+    TopBarSprite.print(timeStr);
+
+    // טקסט לבן
+    TopBarSprite.setTextColor(BAR_TEXT_COLOR);
+    TopBarSprite.setCursor(clockX, clockY);
+    TopBarSprite.print(timeStr);
+
+    // =====================
+    // אלמנטים נוספים
+    // =====================
     if (CurrentMusic != nullptr)
     {
         if (!CurrentMusic->pause && CurrentMusic->isPlaying)
@@ -1001,29 +1164,21 @@ void MyOS::UpdateTopBar()
                                  { TopBarSprite.drawPixel(x, y, c); }, 0xF800);
         }
     }
-    if (!haveSDcard)
-    {
-        TopBarSprite.setCursor(2, 5);
-        TopBarSprite.print("Don't Have SD Card");
-    }
-    else
-    {
-        drawImageTransparent(2, 1, 15, 18, SD_SPRITE, [&](int x, int y, uint16_t c)
-                             { TopBarSprite.drawPixel(x, y, c); }, 0xF800);
-    }
+
     if (WifiConnected)
     {
         drawImageTransparent(50, 1, 18, 17, WIFI_PIC, [&](int x, int y, uint16_t c)
                              { TopBarSprite.drawPixel(x, y, c); }, 0xF800);
     }
+
     if (showMemoryOnScreen)
     {
+        TopBarSprite.setTextColor(BAR_TEXT_COLOR, BAR_COLOR_1);
         TopBarSprite.setCursor(2, 1);
-        TopBarSprite.setTextColor(BLACK, WHITE);
         TopBarSprite.print(getHeapInfoKB());
     }
 
-    TopBarSprite.pushSprite(0, 0);
+    TopBarSprite.pushSprite(0, 135 - TopBarYsize);
     TopBarSprite.deleteSprite();
 }
 
@@ -1038,7 +1193,9 @@ void MyOS::saveSettings()
     SD.mkdir("/AdvanceOS");
 
     JsonDocument doc;
-
+    JsonArray menuOrder = doc["mainScreenIndices"].to<JsonArray>();
+    for (int idx : mainScreenIndices)
+        menuOrder.add(idx);
     doc["volume"] = volume;
     doc["brightness"] = brightness;
     doc["LastFolderOfSongPlayed"] = LastFolderPlaySongInSave;
@@ -1054,6 +1211,11 @@ void MyOS::saveSettings()
     // doc["LastAppInstalledPath"] = LastAppInstalledPath;
     doc["showMemoryOnScreen"] = showMemoryOnScreen;
     doc["CurrentThemeSelected"] = CurrentThemeSelectedPath;
+    doc["TimeToTurnOff"] = TimeToTurnOff;
+
+    JsonArray filePathsArray = doc["filePathsInMainMenu"].to<JsonArray>();
+    for (const String &path : filesInMainMenu)
+        filePathsArray.add(path);
 
     File file = SD.open("/AdvanceOS/settings.json", FILE_WRITE);
     if (!file)
@@ -1094,6 +1256,8 @@ void MyOS::loadSettings()
         return;
     }
 
+    TimeToTurnOff = doc["TimeToTurnOff"] | 1800;
+
     volume = doc["volume"] | 50;
     M5Cardputer.Speaker.setVolume(volume);
     brightness = doc["brightness"] | 100;
@@ -1107,9 +1271,21 @@ void MyOS::loadSettings()
     FontSelected = doc["FONT_SELECTED"] | 0;
     // LastAppInstalledPath = doc["LastAppInstalledPath"] | "";
 
+    if (doc["filePathsInMainMenu"].is<JsonArray>())
+    {
+        filesInMainMenu.clear();
+        for (const String &path : doc["filePathsInMainMenu"].as<JsonArray>())
+            filesInMainMenu.push_back(path);
+    }
     FileSelectedInFS = doc["File_Selected"] | "";
     showMemoryOnScreen = doc["showMemoryOnScreen"] | false;
     CurrentThemeSelectedPath = doc["CurrentThemeSelected"] | "";
+    if (doc["mainScreenIndices"].is<JsonArray>())
+    {
+        mainScreenIndices.clear();
+        for (int idx : doc["mainScreenIndices"].as<JsonArray>())
+            mainScreenIndices.push_back(idx);
+    }
 }
 
 String MyOS::getFileNameFromPath(const String &path)
@@ -1252,7 +1428,6 @@ void MyOS::StepCounterLoop()
 {
     if (StepCounterWork)
     {
-
         if (sampleTimer < SAMPLE_INTERVAL)
             return;
 
@@ -1353,17 +1528,13 @@ int MyOS::loadFastBootVar() // load var after restart
     }
 } */
 
-void MyOS::PlayWavFile(const char *path)
-{
-    InCurrentSong = 0;
-    SongList[0] = path;
-    SongsInTheList = 1;
-    SongReady = true;
-}
-
 void MyOS::AddSongToTheList(const char *path)
 {
-    SongList[SongsInTheList] = path;
+    if (SongsInTheList > 199) // if pass the array of 200 songs
+    {
+        return;
+    }
+    CurrentMusic->SongList[SongsInTheList] = path;
     SongsInTheList++;
 }
 
@@ -1692,6 +1863,7 @@ String MyOS::createFile(fs::FS &fs, const String &folderPath, const String &base
         return ""; // create filed
     }
 }
+
 // inplement the main picture logo
 const unsigned short AdvanceOS_LOGO[32400] PROGMEM = {
     0xFC4B,
