@@ -141,7 +141,7 @@ Starting from Launcher version 2.7.0 and up, you must modify the partitions from
 Step 1: Recommended — delete all existing partitions
 Open PMan from the menu.
 All white lines represent partitions — select each one (except "FREE") and choose Remove.
-Then select Apply Changes.
+Then select Apply Changes.(Grey Line)
 When prompted to restart, reboot the Cardputer.
 
 Step 2: Install AdvanceOS
@@ -154,14 +154,16 @@ Step 4: Create a new OTA partition
 Open PMan again, select FREE, then choose Add OTA.
 Use the arrow keys until you see End, then press Enter.
 Move the end handle (the right handle) to the left until the size is 1MB.
-Press Enter again and select Confirm.
+Press Enter again and select Confirm/Enter.
 
 Step 5: Create a new SPIFFS partition
 In PMan, click FREE again and choose Add SPIFFS.
 Keep the default name spiffs (just press OK).
 Allocate as much space as possible — this is where your ROM files will be stored.
 In Launcher version 2.7.2, SPIFFS automatically uses all available free space by default.
-
+Press Enter again and select Confirm/Enter.
+Then select Apply Changes. (Grey Line)
+Now All The Games Will Work, (if rom size is bigger then the spiffs partition size the game will not work)
 
 
 ## Media Player
