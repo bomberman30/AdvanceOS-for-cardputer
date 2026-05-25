@@ -25,6 +25,10 @@ Music Composer<br>
 <br>
 Games (ARDUBOY NES GBC games) <br>
 <img src="gitFiles/screen_18665.bmp?raw=true">  <img src="gitFiles/screen_13548.bmp?raw=true"> <img src="gitFiles/Mario Golf.gbc22988.bmp?raw=true"> <img src="gitFiles/Kirby's Dream Land 2.gb25907.bmp?raw=true">  <img src="gitFiles/ArduboyGame104256116.bmp?raw=true"><br>
+Screen filter in games (games: Pokemon Crystal Clear, super marion delux)
+<img src="gitFiles/game_filters/Pokemon%20(Crystal%20Clear%20v2.6.0).gbc27810.bmp?raw=true"><img src="gitFiles/game_filters/Pokemon%20(Crystal%20Clear%20v2.6.0).gbc34628.bmp?raw=true"><img src="gitFiles/game_filters/Pokemon%20(Crystal%20Clear%20v2.6.0).gbc36284.bmp?raw=true"><br>
+
+<img src="gitFiles/game_filters/Super%20Mario%20Bros.%20Deluxe.gbc29773.bmp?raw=true"><img src="gitFiles/game_filters/Super%20Mario%20Bros.%20Deluxe.gbc33912.bmp?raw=true"><img src="gitFiles/game_filters/Super%20Mario%20Bros.%20Deluxe.gbc36567.bmp?raw=true"><img src="gitFiles/game_filters/Super%20Mario%20Bros.%20Deluxe.gbc38590.bmp?raw=true">
 <br><br>
 Notes<br>
 <img src="gitFiles/screen_410451.bmp?raw=true"><br>
@@ -134,6 +138,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - X is B button
 - ENTER is START button
 - BACKSPACE / DEL button is SELECT button
+- you can change the keys by Enter "fun stuff"
 - in emulator NES or GBC also "L" and "K" "1" and "2" and "WASD" keys suppurted
 - In GameBoy games and NES games Press 4 key to save the current state and 5 key to load save state
 # importent how to anable games if advanceOS installed on  launcher version 2.7.0 and up!!
