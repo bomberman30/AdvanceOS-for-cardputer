@@ -7,8 +7,8 @@
 
 struct Note
 {
-    int x; // מיקום על ציר הזמן (Grid Step)
-    int y; // גובה הצליל (Pitch)
+    int x; 
+    int y; 
 };
 
 class MusicCreator : public GlobalParentClass
@@ -24,7 +24,6 @@ public:
 private:
     unsigned long channelStartTime[8] = {0};
     bool channelActive[8] = {false};
-    // הגדרות הגריד
     const int cellWidth = 10;
     const int cellHeight = 10;
 
@@ -38,12 +37,11 @@ private:
     int cursorX = 0;
     int cursorY = 59;
 
-    // משתני נגינה
     bool isPlaying = false;
     int currentPlayStep = -1;
     unsigned long lastStepMillis = 0;
     int bpm = 200;
-    std::vector<Note> notes; // רשימת התווים שהמשתמש הניח
+    std::vector<Note> notes; 
 
     std::vector<float> currentChord;
     int arpIndex = 0;
@@ -65,7 +63,6 @@ private:
     bool PlayFromCurrentScreen = false;
     void MoveAllNoteFromRightOfTheCourser(int x, int y);
 
-    // פונקציית עזר לכתיבת ה-Header של קובץ ה-WAV
     void writeWavHeader(File &file, uint32_t dataSize, uint32_t sampleRate);
     void removeDuplicateNotes(std::vector<Note> &notes);
     void ExportAsWav();
