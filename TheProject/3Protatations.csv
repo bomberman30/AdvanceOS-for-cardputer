@@ -1,7 +1,0 @@
-# Name, Type, SubType, Offset,Size
-nvs,data,nvs,0x9000,0x6000 
-app0,app,ota_0,0x10000,0x160000 
-app1,app,ota_1,0x170000,0x200000 
-app2,app,ota_2,0x370000,0x200000
-spiffs,data,spiffs,0x570000,0x280000
-coredump,data,coredump,0x7F0000,0x10000
