@@ -58,6 +58,9 @@ Upcoming features include text viewing and editing, as well as image display cap
 * NES : NES games
 * GBC GB : Old Gameboy and Gameboy Color games
 
+## 🧩 Need Help!!
+i need help in music composer development see
+https://github.com/bomberman30/AdvanceOS-for-cardputer/issues/20
 
 ## 🚀 Installation Options
 
