@@ -131,7 +131,7 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - SPACE BAR to play from current Screen (good for long song for not play all the song from the start)
 - Left Arrow Keys D, F, G, T,: move notes from the Right of the courser to any direction (good to fix lot of notes if not in place)
 
-## Games
+## Games (if using via launcher it's recomended to use launcher V 2.6.10 (it's more simple to use and work good no less then the new version)
 - ESC exit the game and back to file explorer 
 - Arrow key
 - Z is A button
@@ -141,7 +141,8 @@ How to format to FAT https://www.instructables.com/Format-USB-Flash-Drive-to-FAT
 - you can change the keys by Enter "fun stuff"
 - in emulator NES or GBC also "L" and "K" "1" and "2" and "WASD" keys suppurted
 - In GameBoy games and NES games Press 4 key to save the current state and 5 key to load save state
-# importent how to anable games if advanceOS installed on  launcher version 2.7.0 and up!!
+
+- importent how to anable games if advanceOS installed on  launcher version 2.7.0 and up!!
 
 (if you install advanceOS directly from m5 burner the game will work fine! no modify nedded)
 Starting from Launcher version 2.7.0 and up, you must modify the partitions from within the launcher itself to enable game support.
